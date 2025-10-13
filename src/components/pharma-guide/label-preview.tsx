@@ -52,15 +52,14 @@ export default function LabelPreview({
         }
     } else { // meal-time
         switch(mealTime) {
-            case 'morning': intervalText = "সকালে"; break;
-            case 'noon': intervalText = "দুপুরে"; break;
-            case 'afternoon': intervalText = "বিকালে"; break;
-            case 'night': intervalText = "রাতে"; break;
-            case 'morning-night': intervalText = "সকালে ও রাতে"; break;
-            case 'morning-afternoon': intervalText = "সকালে ও বিকালে"; break;
+            case 'morning': intervalText = `<strong class="text-red-700">সকালে</strong>`; break;
+            case 'noon': intervalText = `<strong class="text-red-700">দুপুরে</strong>`; break;
+            case 'afternoon': intervalText = `<strong class="text-red-700">বিকালে</strong>`; break;
+            case 'night': intervalText = `<strong class="text-red-700">রাতে</strong>`; break;
+            case 'morning-night': intervalText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">রাতে</strong>`; break;
+            case 'morning-afternoon': intervalText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">বিকালে</strong>`; break;
             default: intervalText = "___";
         }
-        intervalText = `<strong class="text-red-700">${intervalText}</strong>`
     }
 
     const bnShakeCount = shakeMode === 'with' && shakeCount !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(shakeCount)} বার</strong>` : '___';
@@ -168,9 +167,3 @@ export default function LabelPreview({
     </div>
   );
 }
-
-    
-
-    
-
-    
