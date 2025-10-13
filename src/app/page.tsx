@@ -73,11 +73,8 @@ export default function Home() {
         const parsedState = JSON.parse(savedState);
         parsedState.date = new Date(parsedState.date);
         
-        // Ensure default counseling items are present if they are missing
-        let counselingNeedsUpdate = false;
         if (!parsedState.counseling || parsedState.counseling.length === 0) {
           parsedState.counseling = [...defaultCounseling];
-          counselingNeedsUpdate = true;
         }
 
         const followUpDays = parsedState.followUpDays || 7;
@@ -85,13 +82,9 @@ export default function Home() {
         const followUpIndex = parsedState.counseling.findIndex((c: string) => c.includes("পরে আসবেন"));
         
         if (followUpIndex > -1) {
-            if(parsedState.counseling[followUpIndex] !== followUpText) {
-                parsedState.counseling[followUpIndex] = followUpText;
-                counselingNeedsUpdate = true;
-            }
-        } else {
-            parsedState.counseling.push(followUpText);
-            counselingNeedsUpdate = true;
+          parsedState.counseling[followUpIndex] = followUpText;
+        } else if (parsedState.followUpDays !== undefined) {
+           parsedState.counseling.push(followUpText);
         }
         
         if (!parsedState.intervalMode) parsedState.intervalMode = 'hourly';
@@ -137,6 +130,12 @@ export default function Home() {
   const triggerPrint = useCallback(() => {
       const container = printContainerRef.current;
       if (!container) return;
+
+      // Remove any existing printable content before creating a new one
+      const existingPrintableContent = document.getElementById('printable-content');
+      if (existingPrintableContent) {
+        document.body.removeChild(existingPrintableContent);
+      }
 
       const printableContent = document.createElement('div');
       printableContent.id = 'printable-content';
