@@ -77,8 +77,10 @@ export default function Home() {
           parsedState.counseling = [...defaultCounseling];
         }
         
+        // Ensure intervalMode and mealTime have default values if missing
         if (!parsedState.intervalMode) parsedState.intervalMode = 'hourly';
-        if (!parsedState.mealTime) parsedState.mealTime = 'none';
+        if (parsedState.mealTime === undefined) parsedState.mealTime = 'none';
+
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
         
         return { ...defaultLabelState, ...parsedState };
@@ -114,10 +116,11 @@ export default function Home() {
     }
   }, [labelState, isClient]);
   
- const triggerPrint = useCallback(() => {
-    const container = printContainerRef.current;
-    if (!container) return;
+  const triggerPrint = useCallback(() => {
+    const previewContainer = printContainerRef.current;
+    if (!previewContainer) return;
 
+    // Remove any existing printable content to avoid duplicates
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -126,7 +129,7 @@ export default function Home() {
     const printableContent = document.createElement('div');
     printableContent.id = 'printable-content';
 
-    const labelNodes = container.querySelectorAll('.prescription-sheet-final');
+    const labelNodes = previewContainer.querySelectorAll('.prescription-sheet-final');
     if (labelNodes.length === 0) return;
 
     labelNodes.forEach(labelNode => {

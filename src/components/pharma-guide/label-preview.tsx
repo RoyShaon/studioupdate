@@ -48,8 +48,8 @@ export default function LabelPreview({
             case 'noon': timeText = `<strong class="text-red-700">দুপুরে</strong>`; break;
             case 'afternoon': timeText = `<strong class="text-red-700">বিকালে</strong>`; break;
             case 'night': timeText = `<strong class="text-red-700">রাতে</strong>`; break;
-            case 'morning-night': timeText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">রাতে</strong>`; break;
-            case 'morning-afternoon': timeText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">বিকালে</strong>`; break;
+            case 'morning-night': timeText = `<strong class="text-red-700">সকালে ও রাতে</strong>`; break;
+            case 'morning-afternoon': timeText = `<strong class="text-red-700">সকালে ও বিকালে</strong>`; break;
         }
     }
     
@@ -57,10 +57,8 @@ export default function LabelPreview({
     if ((intervalMode === 'hourly' || intervalMode === 'daily') && interval) {
         const bnIntervalNumber = convertToBanglaNumerals(interval);
         const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
-        const suffix = timeText ? ' অন্তর' : ' অন্তর অন্তর';
-        intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong>${suffix}`;
-    } else if ((intervalMode === 'hourly' || intervalMode === 'daily') && !interval) {
-        intervalText = '___ অন্তর অন্তর';
+        const suffix = 'অন্তর';
+        intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong> ${suffix}`;
     } else if (intervalMode === 'meal-time' && mealTime === 'none') {
         intervalText = "___";
     }
@@ -80,6 +78,8 @@ export default function LabelPreview({
     let bnMixtureAmount = `<strong class="text-red-700">${convertToBanglaNumerals(mixtureAmount.replace(' ঔষধ', ''))}</strong>`;
      if (!mixtureAmount.includes('সবটুকু')) {
         bnMixtureAmount = `${bnMixtureAmount.replace('১', '১&zwnj;')} ঔষধ`;
+    } else {
+        bnMixtureAmount += ` ঔষধ`;
     }
 
     const bnDurationDays = durationDays ? `<strong class="text-red-700">${convertToBanglaNumerals(durationDays)} দিন</strong>` : '___';
@@ -95,9 +95,6 @@ export default function LabelPreview({
     }
     
     let processedInstruction = convertToBanglaNumerals(instruction);
-     if (timeText && intervalText) {
-      processedInstruction = processedInstruction.replace(' অন্তর অন্তর ', ' অন্তর ');
-    }
     
     // Dynamic class for font size adjustment
     const INSTRUCTION_LENGTH_THRESHOLD = 190;
