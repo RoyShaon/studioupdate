@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 
 
 export type IntervalMode = "hourly" | "daily" | "meal-time";
-export type MealTime = "morning" | "afternoon" | "night" | "morning-night";
+export type MealTime = "morning" | "noon" | "afternoon" | "night" | "morning-night" | "morning-afternoon";
 
 export type LabelState = {
   serial: string;
@@ -285,6 +285,8 @@ export default function Home() {
 
 
 
+
+    
 
     
 

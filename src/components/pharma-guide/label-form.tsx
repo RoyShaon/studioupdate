@@ -389,9 +389,11 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                   </SelectTrigger>
                   <SelectContent>
                       <SelectItem value="morning">সকালে</SelectItem>
-                      <SelectItem value="afternoon">দুপুরে</SelectItem>
+                      <SelectItem value="noon">দুপুরে</SelectItem>
+                      <SelectItem value="afternoon">বিকালে</SelectItem>
                       <SelectItem value="night">রাতে</SelectItem>
                       <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
+                      <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
                   </SelectContent>
                 </Select>
           </div>
@@ -513,5 +515,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
 
     

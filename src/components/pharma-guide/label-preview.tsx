@@ -53,9 +53,11 @@ export default function LabelPreview({
     } else { // meal-time
         switch(mealTime) {
             case 'morning': intervalText = "সকালে"; break;
-            case 'afternoon': intervalText = "দুপুরে"; break;
+            case 'noon': intervalText = "দুপুরে"; break;
+            case 'afternoon': intervalText = "বিকালে"; break;
             case 'night': intervalText = "রাতে"; break;
             case 'morning-night': intervalText = "সকালে ও রাতে"; break;
+            case 'morning-afternoon': intervalText = "সকালে ও বিকালে"; break;
             default: intervalText = "___";
         }
         intervalText = `<strong class="text-red-700">${intervalText}</strong>`
@@ -166,6 +168,8 @@ export default function LabelPreview({
     </div>
   );
 }
+
+    
 
     
 
