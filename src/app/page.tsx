@@ -81,7 +81,20 @@ export default function Home() {
         if (!parsedState.mealTime) parsedState.mealTime = 'none';
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
         
-        return { ...defaultLabelState, ...parsedState };
+        const counselingWithFollowUp = [...(parsedState.counseling || defaultCounseling)];
+        const followUpDays = parsedState.followUpDays === undefined ? 7 : parsedState.followUpDays;
+        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
+        const followUpIndex = counselingWithFollowUp.findIndex(c => c.includes("পরে আসবেন"));
+        
+        if (followUpDays !== undefined) {
+            if (followUpIndex > -1) {
+                counselingWithFollowUp[followUpIndex] = followUpText;
+            } else {
+                counselingWithFollowUp.push(followUpText);
+            }
+        }
+        
+        return { ...defaultLabelState, ...parsedState, counseling: counselingWithFollowUp };
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
@@ -129,15 +142,15 @@ export default function Home() {
       const printableContent = document.createElement('div');
       printableContent.id = 'printable-content';
 
-      const previews = container.querySelectorAll('.printable-label-wrapper');
+      const labelNodes = container.querySelectorAll('.prescription-sheet-final');
 
-      previews.forEach(previewNode => {
+      labelNodes.forEach(labelNode => {
         const sheet = document.createElement('div');
         sheet.className = "print-page";
-        sheet.innerHTML = previewNode.innerHTML;
+        sheet.innerHTML = labelNode.outerHTML;
         printableContent.appendChild(sheet);
       });
-
+      
       if (printableContent.hasChildNodes()) {
         document.body.appendChild(printableContent);
         window.print();
@@ -166,9 +179,9 @@ export default function Home() {
   const renderPreviews = useCallback(() => {
     const count = Number(labelState.labelCount) || 1;
     return Array.from({ length: count }, (_, i) => i + 1).map(index => (
-        <div key={index} className="printable-label-wrapper">
-        <LabelPreview {...labelState} activeLabelIndex={index} />
-        </div>
+      <div key={index} className="printable-label-wrapper">
+         <LabelPreview {...labelState} activeLabelIndex={index} />
+      </div>
     ));
   }, [labelState]);
 
@@ -251,4 +264,6 @@ export default function Home() {
     </main>
   );
 }
+    
+
     
