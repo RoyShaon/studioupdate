@@ -199,7 +199,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight font-body text-indigo-700">
+            <h1 className="text-4xl font-bold tracking-tight font-body text-primary">
               ত্রিফুল আরোগ্য নিকেতন
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -253,7 +253,7 @@ export default function Home() {
                   </div>
                 </CardContent>
                  <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6">
-                    <Button onClick={handlePrint} className="text-white font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-primary/50">
+                    <Button onClick={handlePrint} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-primary/50">
                       <Printer className="mr-2 h-4 w-4" />
                       প্রিন্ট করুন
                     </Button>
