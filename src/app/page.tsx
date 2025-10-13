@@ -38,7 +38,6 @@ export type LabelState = {
   counseling: string[];
   labelCount: number | '';
   followUpDays: number | '';
-  showAllPreviews: boolean;
 };
 
 const defaultCounseling = [
@@ -64,13 +63,11 @@ const defaultLabelState: LabelState = {
   counseling: defaultCounseling,
   labelCount: 1,
   followUpDays: 7,
-  showAllPreviews: false,
 };
 
 export default function Home() {
   const [labelState, setLabelState] = useState<LabelState>(defaultLabelState);
   
-  const [activeLabelIndex, setActiveLabelIndex] = useState(1);
   const [isClient, setIsClient] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const printContainerRef = useRef<HTMLDivElement>(null);
@@ -117,15 +114,6 @@ export default function Home() {
     }
   }, [labelState, isClient]);
   
-  useEffect(() => {
-    const count = Number(labelState.labelCount);
-    const currentCount = isNaN(count) || count < 1 ? 1 : count;
-    
-    if (activeLabelIndex > currentCount) {
-      setActiveLabelIndex(currentCount);
-    }
-  }, [labelState.labelCount, activeLabelIndex]);
-
   const triggerPrint = useCallback(() => {
       const container = printContainerRef.current;
       if (!container) return;
@@ -161,24 +149,16 @@ export default function Home() {
       localStorage.removeItem("pharmaLabelState");
     }
     setLabelState(defaultLabelState);
-    setActiveLabelIndex(1);
   }, [isClient]);
 
   const renderPreviews = useCallback(() => {
     const count = Number(labelState.labelCount) || 1;
-    if (labelState.showAllPreviews) {
-      return Array.from({ length: count }, (_, i) => i + 1).map(index => (
+    return Array.from({ length: count }, (_, i) => i + 1).map(index => (
         <div key={index} className="printable-label-wrapper mb-4">
-          <LabelPreview {...labelState} activeLabelIndex={index} />
+        <LabelPreview {...labelState} activeLabelIndex={index} />
         </div>
-      ));
-    }
-    return (
-      <div className="printable-label-wrapper">
-        <LabelPreview {...labelState} activeLabelIndex={activeLabelIndex} />
-      </div>
-    );
-  }, [labelState, activeLabelIndex]);
+    ));
+  }, [labelState]);
   
    // Update counseling when followUpDays changes
   useEffect(() => {
@@ -255,19 +235,16 @@ export default function Home() {
               <LabelForm 
                 state={labelState} 
                 setState={setLabelState} 
-                activeLabelIndex={activeLabelIndex}
-                setActiveLabelIndex={setActiveLabelIndex}
               />
             </CardContent>
           </Card>
 
           <div className="lg:col-span-3">
-             <Card className="shadow-lg">
+             <Card className="shadow-lg sticky top-8">
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-semibold">ফর্মের প্রিভিউ</CardTitle>
                   <CardDescription>
                     নিচের ফরম্যাটটি প্রিন্ট লেবেলের মতো দেখাবে ({convertToBanglaNumerals('3.6')}” x {convertToBanglaNumerals('5.6')}”)। 
-                    {!labelState.showAllPreviews && currentLabelCount > 1 && ` মোট ${convertToBanglaNumerals(currentLabelCount)}টি লেবেলের মধ্যে ${convertToBanglaNumerals(activeLabelIndex)} নং লেবেল দেখানো হচ্ছে।`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -275,26 +252,25 @@ export default function Home() {
                       {renderPreviews()}
                   </div>
                 </CardContent>
+                 <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6">
+                    <Button onClick={handlePrint} className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50">
+                      <Printer className="mr-2 h-4 w-4" />
+                      প্রিন্ট করুন
+                    </Button>
+                     <div className="max-w-xs w-full">
+                        <Label htmlFor="zoom-slider">জুম লেভেল: {convertToBanglaNumerals(zoomLevel)}%</Label>
+                        <Slider
+                            id="zoom-slider"
+                            min={50}
+                            max={150}
+                            step={10}
+                            value={[zoomLevel]}
+                            onValueChange={(value) => setZoomLevel(value[0])}
+                            className="mt-2"
+                        />
+                    </div>
+                </div>
              </Card>
-
-             <div className="flex justify-center items-center flex-wrap gap-4 mt-6">
-                <Button onClick={handlePrint} className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50">
-                  <Printer className="mr-2 h-4 w-4" />
-                  প্রিন্ট করুন
-                </Button>
-            </div>
-             <div className="max-w-xs mx-auto mt-4">
-                <Label htmlFor="zoom-slider">জুম লেভেল: {convertToBanglaNumerals(zoomLevel)}%</Label>
-                <Slider
-                    id="zoom-slider"
-                    min={50}
-                    max={150}
-                    step={10}
-                    value={[zoomLevel]}
-                    onValueChange={(value) => setZoomLevel(value[0])}
-                    className="mt-2"
-                />
-            </div>
           </div>
         </div>
       </div>
@@ -308,3 +284,6 @@ export default function Home() {
     
 
 
+
+
+    

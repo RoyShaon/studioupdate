@@ -11,8 +11,6 @@ import { CalendarIcon, PlusCircle, XCircle, ChevronDown, Mic, Check } from "luci
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn, convertToBanglaNumerals } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Collapsible,
   CollapsibleContent,
@@ -32,8 +30,6 @@ import { Textarea } from "@/components/ui/textarea";
 interface LabelFormProps {
   state: LabelState;
   setState: Dispatch<SetStateAction<LabelState>>;
-  activeLabelIndex: number;
-  setActiveLabelIndex: Dispatch<SetStateAction<number>>;
 }
 
 const predefinedCounseling: string[] = [
@@ -62,7 +58,7 @@ const defaultCounselingItems = [
 const SpeechRecognition =
   (typeof window !== 'undefined' && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition));
 
-export default function LabelForm({ state, setState, activeLabelIndex, setActiveLabelIndex }: LabelFormProps) {
+export default function LabelForm({ state, setState }: LabelFormProps) {
   const [selectedCounseling, setSelectedCounseling] = useState<string>("");
   const [customCounseling, setCustomCounseling] = useState("");
   const [isCounselingOpen, setIsCounselingOpen] = useState(false);
@@ -238,11 +234,6 @@ export default function LabelForm({ state, setState, activeLabelIndex, setActive
           counseling: prevState.counseling.filter((_, i) => i !== index)
       }));
   }, [setState]);
-  
-  const getSanitizedLabelCount = () => {
-    const count = Number(state.labelCount);
-    return isNaN(count) || count < 1 ? 1 : count;
-  };
 
   return (
     <div className="space-y-6">
@@ -519,35 +510,8 @@ export default function LabelForm({ state, setState, activeLabelIndex, setActive
             </div>
         </CollapsibleContent>
        </Collapsible>
-
-
-       <div className="space-y-4">
-        <div className="flex items-center gap-4">
-           
-            {getSanitizedLabelCount() > 1 && (
-              <div className="flex items-center space-x-2 pt-6">
-                <Checkbox 
-                  id="showAllPreviews"
-                  checked={state.showAllPreviews}
-                  onCheckedChange={(checked) => setState(prev => ({ ...prev, showAllPreviews: !!checked }))}
-                />
-                <Label htmlFor="showAllPreviews">সকল প্রিভিউ দেখুন</Label>
-              </div>
-            )}
-        </div>
-        {getSanitizedLabelCount() > 1 && !state.showAllPreviews && (
-            <div className="space-y-2">
-                <Label>কোন লেবেলটি প্রিভিউ করবেন? ({convertToBanglaNumerals(activeLabelIndex)})</Label>
-                <Slider
-                    value={[activeLabelIndex]}
-                    onValueChange={(value) => setActiveLabelIndex(value[0])}
-                    min={1}
-                    max={getSanitizedLabelCount()}
-                    step={1}
-                />
-            </div>
-        )}
-      </div>
     </div>
   );
 }
+
+    
