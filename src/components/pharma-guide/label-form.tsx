@@ -237,10 +237,10 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   
   const handleIntervalModeChange = useCallback((value: IntervalMode) => {
     setState(prev => {
-        if (value !== 'meal-time') {
-            return {...prev, intervalMode: value};
+        if (value === 'meal-time') {
+            return {...prev, intervalMode: value, mealTime: 'morning'};
         }
-        return {...prev, intervalMode: value, mealTime: 'morning'};
+        return {...prev, intervalMode: value, mealTime: 'none'};
     });
   }, [setState]);
 
@@ -377,7 +377,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
           </div>
         </div>
 
-        {state.intervalMode !== 'meal-time' && (
+        {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                   <Label htmlFor="interval">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর খাবেন?</Label>
@@ -385,9 +385,8 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
               </div>
           </div>
         )}
-
         
-        <div >
+        <div>
             <Label htmlFor="mealTime">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
             <Select
                 name="mealTime"
