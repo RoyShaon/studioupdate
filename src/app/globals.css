@@ -243,8 +243,8 @@
     display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100% !important;
+    height: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
   }
@@ -260,7 +260,6 @@
     line-height: 1.3 !important;
   }
   
-  /* Make all text black for printing */
   .print-page .text-red-700,
   .print-page .text-indigo-700 {
     color: #000 !important;
@@ -292,5 +291,6 @@
     
 
     
+
 
 
