@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, PlusCircle, XCircle, ChevronDown, Mic, Check } from "lucide-react";
+import { CalendarIcon, PlusCircle, XCircle, ChevronDown, Mic } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn, convertToBanglaNumerals } from "@/lib/utils";
@@ -47,13 +47,6 @@ const predefinedCounseling: string[] = [
   "• অতিরিক্ত দেয়া ঔষধ ফোন না করে খাবেন না।"
 ];
 
-const defaultCounselingItems = [
-  "• ঔষধ সেবনকালীন যাবতীয় ঔষধি নিষিদ্ধ।",
-  "• ঔষধ সেবনের আধা ঘন্টা আগে-পরে জল ব্যতিত কোন খাবার খাবেন না।",
-  "• জরুরী প্রয়োজনে বিকাল <strong>৫টা</strong> থেকে <strong>৭টার</strong> মধ্যে ফোন করুন।",
-  `• <strong>৭ দিন</strong> পরে আসবেন।`,
-];
-
 // Check for SpeechRecognition API
 const SpeechRecognition =
   (typeof window !== 'undefined' && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition));
@@ -67,8 +60,8 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   const [speechRecognitionSupported, setSpeechRecognitionSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
-  const transcriptRef = useRef<string>("");
-  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const patientNameInputRef = useRef<HTMLInputElement>(null);
+  const finalTranscriptRef = useRef<string>("");
 
 
   useEffect(() => {
@@ -84,39 +77,37 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     recognition.interimResults = true;
 
     recognition.onresult = (event: any) => {
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
+        let interim_transcript = '';
+        let final_transcript_piece = '';
 
-      let interim_transcript = '';
-      let final_transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-           final_transcript += event.results[i][0].transcript + ' ';
-        } else {
-          interim_transcript += event.results[i][0].transcript;
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                final_transcript_piece += event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
         }
-      }
-      
-      transcriptRef.current += final_transcript;
-      setState(prevState => ({
-        ...prevState,
-        patientName: transcriptRef.current + interim_transcript,
-      }));
-      
-      silenceTimerRef.current = setTimeout(() => {
-        recognition.stop();
-      }, 3000);
+        
+        if (final_transcript_piece) {
+            finalTranscriptRef.current += final_transcript_piece + ' ';
+        }
+
+        const nameInput = patientNameInputRef.current;
+        if(nameInput) {
+            const start = nameInput.selectionStart ?? finalTranscriptRef.current.length;
+            const end = nameInput.selectionEnd ?? finalTranscriptRef.current.length;
+            const textBefore = finalTranscriptRef.current.substring(0, start);
+            const textAfter = finalTranscriptRef.current.substring(end);
+
+            const newText = textBefore + (interim_transcript || '') + textAfter;
+            
+            setState(prevState => ({ ...prevState, patientName: newText }));
+        } else {
+             setState(prevState => ({ ...prevState, patientName: finalTranscriptRef.current + interim_transcript}));
+        }
     };
 
     recognition.onerror = (event: any) => {
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
-      if (event.error === 'aborted' || event.error === 'no-speech') {
-        return;
-      }
-      
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
          toast({
@@ -129,12 +120,10 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     };
 
     recognition.onend = () => {
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
       setIsListening(false);
-       if (transcriptRef.current.trim()) {
-            setState(prevState => ({...prevState, patientName: prevState.patientName.trim()}));
+       if (finalTranscriptRef.current.trim()) {
+           const finalName = finalTranscriptRef.current.trim();
+           setState(prevState => ({...prevState, patientName: finalName}));
       }
     };
     
@@ -142,9 +131,6 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
 
     return () => {
       recognitionRef.current?.abort();
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
     };
   }, [setState, toast]);
 
@@ -155,17 +141,20 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     if (isListening) {
       recognition.stop();
     } else {
-      transcriptRef.current = state.patientName ? state.patientName + ' ' : '';
+      finalTranscriptRef.current = state.patientName || '';
+      if(finalTranscriptRef.current && !finalTranscriptRef.current.endsWith(' ')) {
+          finalTranscriptRef.current += ' ';
+      }
       recognition.start();
     }
     setIsListening(prevState => !prevState);
   }, [isListening, state.patientName]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setState((prevState) => ({ ...prevState, [name]: value }));
     if (name === 'patientName') {
-        transcriptRef.current = value;
+        finalTranscriptRef.current = value;
     }
   }, [setState]);
 
@@ -187,7 +176,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         setState(prevState => ({ ...prevState, labelCount: 1 }));
     } else if (!isNaN(numValue) && numValue > 0) {
         setState(prevState => ({ ...prevState, labelCount: numValue }));
-    } else {
+    } else if (!isNaN(numValue) && numValue < 1) {
         setState(prevState => ({ ...prevState, labelCount: 1 }));
     }
   };
@@ -241,6 +230,29 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     });
   }, [setState]);
 
+  useEffect(() => {
+    const followUpDays = state.followUpDays || 7;
+    const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
+    
+    setState(prevState => {
+      const counseling = [...(prevState.counseling || [])];
+      const followUpIndex = counseling.findIndex(c => c.includes("পরে আসবেন"));
+      
+      if (followUpIndex !== -1) {
+        if (counseling[followUpIndex] !== followUpText) {
+          counseling[followUpIndex] = followUpText;
+          return {...prevState, counseling };
+        }
+      } else if (prevState.followUpDays) {
+         if (followUpIndex === -1) {
+          counseling.push(followUpText);
+          return {...prevState, counseling };
+        }
+      }
+
+      return prevState;
+    });
+  }, [state.followUpDays, setState]);
 
   return (
     <div className="space-y-6">
@@ -279,7 +291,14 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
       <div>
           <Label htmlFor="patientName">রোগীর নাম</Label>
           <div className="relative flex items-center">
-            <Input id="patientName" name="patientName" value={state.patientName} onChange={handleInputChange} className="pr-10" />
+            <Input 
+              id="patientName"
+              name="patientName"
+              value={state.patientName}
+              onChange={handleInputChange}
+              className="pr-10"
+              ref={patientNameInputRef}
+            />
             {speechRecognitionSupported && (
               <Button
                 type="button"
@@ -379,13 +398,13 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         </div>
         
         <div className="grid grid-cols-2 gap-4">
-          {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
+          {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') ? (
             <div>
                 <Label htmlFor="interval" className="md:hidden">অন্তর (সময়)</Label>
                 <Label htmlFor="interval" className="hidden md:inline">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর?</Label>
                 <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
             </div>
-          )}
+          ) : <div></div>}
           
           {state.intervalMode === 'meal-time' && (
              <div>
@@ -450,12 +469,6 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                     type="number"
                     value={state.labelCount ?? ''}
                     onChange={handleLabelCountChange}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value === '' || parseInt(value, 10) < 1) {
-                        setState(prev => ({...prev, labelCount: 1}));
-                      }
-                    }}
                     min="1"
                 />
             </div>
@@ -499,14 +512,11 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                             <SelectValue placeholder="পরামর্শ নির্বাচন করুন..." />
                         </SelectTrigger>
                         <SelectContent>
-                            {predefinedCounseling.map((item, index) => (
-                                <SelectItem key={index} value={item} disabled={state.counseling.includes(item)}>
-                                  <div className="flex items-center">
-                                      <span className="mr-2">
-                                          {state.counseling.includes(item) ? <Check className="h-4 w-4" /> : <span className="w-4" />}
-                                      </span>
-                                      <span dangerouslySetInnerHTML={{ __html: item.replace(/<strong>/g, '<strong class="text-red-700">') }}></span>
-                                  </div>
+                            {predefinedCounseling
+                                .filter(item => !state.counseling.some(existing => existing.includes(item.replace(/<[^>]*>/g, ''))))
+                                .map((item, index) => (
+                                <SelectItem key={index} value={item}>
+                                  <div dangerouslySetInnerHTML={{ __html: item.replace(/<strong>/g, '<strong class="text-red-700">') }}></div>
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -533,7 +543,3 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
-
-    
-
-    

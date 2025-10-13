@@ -159,32 +159,6 @@ export default function Home() {
         </div>
     ));
   }, [labelState]);
-  
-   // Update counseling when followUpDays changes
-  useEffect(() => {
-    const followUpDays = labelState.followUpDays || 7;
-    const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-    
-    setLabelState(prevState => {
-      const counseling = [...(prevState.counseling || [])];
-      const followUpIndex = counseling.findIndex(c => c.includes("পরে আসবেন"));
-      
-      if (followUpIndex !== -1) {
-        if (counseling[followUpIndex] !== followUpText) {
-          counseling[followUpIndex] = followUpText;
-          return {...prevState, counseling };
-        }
-      } else if (prevState.followUpDays) {
-         if (followUpIndex === -1) {
-          counseling.push(followUpText);
-          return {...prevState, counseling };
-        }
-      }
-
-      return prevState;
-    });
-  }, [labelState.followUpDays]);
-
 
   if (!isClient) {
     return (
@@ -267,6 +241,4 @@ export default function Home() {
     </main>
   );
 }
-    
-
     
