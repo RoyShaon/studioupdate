@@ -15,8 +15,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 
 
 export type IntervalMode = "hourly" | "daily" | "meal-time";
@@ -69,7 +67,6 @@ export default function Home() {
   const [labelState, setLabelState] = useState<LabelState>(defaultLabelState);
   
   const [isClient, setIsClient] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(100);
   const printContainerRef = useRef<HTMLDivElement>(null);
 
   // Load state from local storage on initial render
@@ -252,7 +249,7 @@ export default function Home() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div ref={printContainerRef} style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }}>
+                  <div ref={printContainerRef}>
                       {renderPreviews()}
                   </div>
                 </CardContent>
@@ -261,18 +258,6 @@ export default function Home() {
                       <Printer className="mr-2 h-4 w-4" />
                       প্রিন্ট করুন
                     </Button>
-                     <div className="max-w-xs w-full">
-                        <Label htmlFor="zoom-slider">জুম লেভেল: {convertToBanglaNumerals(zoomLevel)}%</Label>
-                        <Slider
-                            id="zoom-slider"
-                            min={50}
-                            max={150}
-                            step={10}
-                            value={[zoomLevel]}
-                            onValueChange={(value) => setZoomLevel(value[0])}
-                            className="mt-2"
-                        />
-                    </div>
                 </div>
              </Card>
           </div>
