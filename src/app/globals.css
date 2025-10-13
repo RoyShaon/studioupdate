@@ -236,10 +236,12 @@
     color: #000 !important;
   }
 
+  .prescription-sheet-final .instruction-box {
+    border: none;
+  }
+
   @page {
       size: 3.6in 5.6in;
       margin: 0;
   }
 }
-
-    
