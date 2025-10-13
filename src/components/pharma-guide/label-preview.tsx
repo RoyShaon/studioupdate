@@ -139,6 +139,7 @@ export default function LabelPreview({
     <div
       className="prescription-sheet-final font-body"
     >
+      <div className="flex flex-col h-full">
         <div className="space-y-1 pt-2">
             <div>
                 <div className="flex justify-between items-center text-sm font-medium mb-1">
@@ -170,6 +171,8 @@ export default function LabelPreview({
             </div>
         </div>
       
+        <div className="flex-grow"></div>
+      
         <div className="doctor-info text-center mt-2">
             <div className="doctor-info-with-border inline-block">
                 <p className="font-bold text-indigo-700 doctor-title">ত্রিফুল আরোগ্য নিকেতন</p>
@@ -185,9 +188,11 @@ export default function LabelPreview({
                 </p>
             </div>
         </div>
+      </div>
     </div>
   );
 }
+
 
 
 

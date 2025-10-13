@@ -131,12 +131,6 @@ export default function Home() {
       const container = printContainerRef.current;
       if (!container) return;
 
-      // Remove any existing printable content before creating a new one
-      const existingPrintableContent = document.getElementById('printable-content');
-      if (existingPrintableContent) {
-        document.body.removeChild(existingPrintableContent);
-      }
-
       const printableContent = document.createElement('div');
       printableContent.id = 'printable-content';
 
@@ -199,7 +193,7 @@ export default function Home() {
   return (
     <main className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hide-on-print">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold tracking-tight font-body text-primary">
               ত্রিফুল আরোগ্য নিকেতন
@@ -211,7 +205,7 @@ export default function Home() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          <Card className="lg:col-span-2 shadow-lg hide-on-print">
+          <Card className="lg:col-span-2 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="font-body">রোগীর তথ্য ও নির্দেশাবলী</CardTitle>
                 <TooltipProvider>
@@ -243,7 +237,7 @@ export default function Home() {
 
           <div className="lg:col-span-3">
              <Card className="shadow-lg sticky top-8">
-                <CardHeader className="text-center hide-on-print">
+                <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-semibold">ফর্মের প্রিভিউ</CardTitle>
                   <CardDescription>
                     নিচের ফরম্যাটটি প্রিন্ট লেবেলের মতো দেখাবে ({convertToBanglaNumerals('3.6')}” x {convertToBanglaNumerals('5.6')}”)। 
@@ -254,7 +248,7 @@ export default function Home() {
                       {renderPreviews()}
                   </div>
                 </CardContent>
-                 <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6 hide-on-print">
+                 <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6">
                     <Button onClick={handlePrint} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-primary/50">
                       <Printer className="mr-2 h-4 w-4" />
                       প্রিন্ট করুন
