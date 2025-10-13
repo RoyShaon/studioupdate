@@ -100,7 +100,7 @@ export default function LabelPreview({
     }
     
     // Dynamic class for font size adjustment
-    const INSTRUCTION_LENGTH_THRESHOLD = 230;
+    const INSTRUCTION_LENGTH_THRESHOLD = 190;
     const instructionLength = processedInstruction.replace(/<[^>]*>/g, '').length;
     const instructionClassName = cn(
         'instruction-box text-justify',
@@ -191,4 +191,5 @@ export default function LabelPreview({
     </div>
   );
 }
+
 
