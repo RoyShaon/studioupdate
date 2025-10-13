@@ -42,7 +42,7 @@ export default function LabelPreview({
     const bnDrops = drops ? `<strong class="text-red-700">${convertToBanglaNumerals(drops)} ফোঁটা</strong>` : '___';
     
     let timeText = '';
-    if (mealTime !== 'none') {
+    if (mealTime && mealTime !== 'none') {
         switch(mealTime) {
             case 'morning': timeText = `<strong class="text-red-700">সকালে</strong>`; break;
             case 'noon': timeText = `<strong class="text-red-700">দুপুরে</strong>`; break;
@@ -54,20 +54,17 @@ export default function LabelPreview({
     }
     
     let intervalText = '';
-    if ((intervalMode === 'hourly' || intervalMode === 'daily')) {
-        if (interval) {
-            const bnIntervalNumber = convertToBanglaNumerals(interval);
-            const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
-            const suffix = timeText ? ' অন্তর' : ' অন্তর অন্তর';
-            intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong>${suffix}`;
-        } else {
-             intervalText = timeText ? '___ অন্তর' : '___ অন্তর অন্তর';
-        }
+    if ((intervalMode === 'hourly' || intervalMode === 'daily') && interval) {
+        const bnIntervalNumber = convertToBanglaNumerals(interval);
+        const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
+        const suffix = timeText ? ' অন্তর' : ' অন্তর অন্তর';
+        intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong>${suffix}`;
+    } else if ((intervalMode === 'hourly' || intervalMode === 'daily') && !interval) {
+        intervalText = '___ অন্তর অন্তর';
     } else if (intervalMode === 'meal-time' && mealTime === 'none') {
         intervalText = "___";
     }
     
-    // Combine interval and time text
     let finalTimeInstruction = [intervalText, timeText].filter(Boolean).join(' ');
     
     if (intervalMode === 'meal-time' && mealTime !== 'none') {

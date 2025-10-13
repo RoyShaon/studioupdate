@@ -184,7 +184,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     }
   }, [setState]);
 
-  const handleNumberChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleNumberChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (value === '') {
       setState(prevState => ({ ...prevState, [name]: undefined }));
@@ -196,13 +196,11 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   
   const handleLabelCountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-     if (value === '' || parseInt(value, 10) < 1) {
-      setState(prevState => ({ ...prevState, [name]: value === '' ? 1 : 1 }));
-      return;
-    }
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue > 0) {
       setState(prevState => ({ ...prevState, [name]: numValue }));
+    } else {
+      setState(prevState => ({ ...prevState, [name]: value === '' ? 1 : (parseInt(value, 10) || 1) }));
     }
   }, [setState]);
   
@@ -246,7 +244,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   const handleIntervalModeChange = useCallback((value: IntervalMode) => {
     setState(prev => {
         if (value === 'meal-time') {
-            return {...prev, intervalMode: value, mealTime: 'morning'};
+            return {...prev, intervalMode: value, mealTime: 'morning', interval: undefined};
         }
         return {...prev, intervalMode: value, mealTime: 'none'};
     });
@@ -398,6 +396,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                 name="mealTime"
                 value={state.mealTime}
                 onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
+                disabled={state.intervalMode === 'meal-time'}
             >
                 <SelectTrigger>
                     <SelectValue placeholder="নির্বাচন করুন..."/>
