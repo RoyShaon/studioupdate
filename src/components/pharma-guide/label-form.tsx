@@ -236,28 +236,29 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   }, [setState]);
 
   useEffect(() => {
-    const followUpDays = state.followUpDays === undefined ? 7 : state.followUpDays;
-    const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-    
     setState(prevState => {
-      const counseling = [...(prevState.counseling || [])];
-      const followUpIndex = counseling.findIndex(c => c.includes("পরে আসবেন"));
-      
-      if (followUpIndex !== -1) {
-        // If the follow-up text is already there but different, update it
-        if (counseling[followUpIndex] !== followUpText) {
-          counseling[followUpIndex] = followUpText;
-          return {...prevState, counseling };
-        }
-      } else if (prevState.followUpDays !== undefined) {
-         // If it's not there, add it
-         if (followUpIndex === -1) {
-          counseling.push(followUpText);
-          return {...prevState, counseling };
-        }
-      }
+        const followUpDays = prevState.followUpDays;
+        const newCounseling = [...(prevState.counseling || [])];
+        const followUpIndex = newCounseling.findIndex(c => c.includes("পরে আসবেন"));
 
-      return prevState; // No change needed
+        if (followUpDays !== undefined && followUpDays > 0) {
+            const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
+            if (followUpIndex !== -1) {
+                if (newCounseling[followUpIndex] !== followUpText) {
+                    newCounseling[followUpIndex] = followUpText;
+                    return { ...prevState, counseling: newCounseling };
+                }
+            } else {
+                newCounseling.push(followUpText);
+                return { ...prevState, counseling: newCounseling };
+            }
+        } else {
+            if (followUpIndex !== -1) {
+                newCounseling.splice(followUpIndex, 1);
+                return { ...prevState, counseling: newCounseling };
+            }
+        }
+        return prevState;
     });
   }, [state.followUpDays, setState]);
 

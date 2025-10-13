@@ -113,6 +113,7 @@ export default function Home() {
     const container = printContainerRef.current;
     if (!container) return;
 
+    // Remove any existing printable content before creating a new one
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -120,27 +121,20 @@ export default function Home() {
 
     const printableContent = document.createElement('div');
     printableContent.id = 'printable-content';
-    printableContent.innerHTML = container.innerHTML;
 
-    if (printableContent.hasChildNodes()) {
-        document.body.appendChild(printableContent);
-        
-        const labelNodes = printableContent.querySelectorAll('.prescription-sheet-final');
-        const printPagesContainer = document.createElement('div');
-        
-        labelNodes.forEach(labelNode => {
-            const sheet = document.createElement('div');
-            sheet.className = "print-page";
-            sheet.appendChild(labelNode.cloneNode(true));
-            printPagesContainer.appendChild(sheet);
-        });
-        
-        printableContent.innerHTML = '';
-        printableContent.appendChild(printPagesContainer);
-        
-        window.print();
-        document.body.removeChild(printableContent);
-    }
+    const labelNodes = container.querySelectorAll('.prescription-sheet-final');
+    if (labelNodes.length === 0) return;
+
+    labelNodes.forEach(labelNode => {
+        const sheet = document.createElement('div');
+        sheet.className = "print-page";
+        sheet.appendChild(labelNode.cloneNode(true));
+        printableContent.appendChild(sheet);
+    });
+
+    document.body.appendChild(printableContent);
+    window.print();
+    document.body.removeChild(printableContent);
   }, []);
 
   const handlePrint = useCallback(() => {
@@ -243,3 +237,4 @@ export default function Home() {
     
 
     
+
