@@ -81,34 +81,13 @@ export default function Home() {
         if (!parsedState.mealTime) parsedState.mealTime = 'none';
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
         
-        const counselingWithFollowUp = [...(parsedState.counseling || defaultCounseling)];
-        const followUpDays = parsedState.followUpDays === undefined ? 7 : parsedState.followUpDays;
-        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-        const followUpIndex = counselingWithFollowUp.findIndex(c => c.includes("পরে আসবেন"));
-        
-        if (followUpDays !== undefined) {
-            if (followUpIndex > -1) {
-                counselingWithFollowUp[followUpIndex] = followUpText;
-            } else {
-                counselingWithFollowUp.push(followUpText);
-            }
-        }
-        
-        return { ...defaultLabelState, ...parsedState, counseling: counselingWithFollowUp };
+        return { ...defaultLabelState, ...parsedState };
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
     }
     
-    // Return default state with follow up day text
-    const defaultStateWithFollowUp = {
-        ...defaultLabelState,
-        counseling: [
-            ...defaultLabelState.counseling,
-            `• <strong>${convertToBanglaNumerals(defaultLabelState.followUpDays || 7)} দিন</strong> পরে আসবেন।`
-        ]
-    };
-    return defaultStateWithFollowUp;
+    return defaultLabelState;
   });
   
   const [isClient, setIsClient] = useState(false);
@@ -131,23 +110,25 @@ export default function Home() {
   }, [labelState, isClient]);
   
   const triggerPrint = useCallback(() => {
+      const container = printContainerRef.current;
+      if (!container) return;
+
       const existingPrintableContent = document.getElementById('printable-content');
       if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
       }
-
-      const container = printContainerRef.current;
-      if (!container) return;
-
+      
       const printableContent = document.createElement('div');
       printableContent.id = 'printable-content';
-
-      const labelNodes = container.querySelectorAll('.prescription-sheet-final');
+      
+      const previewNode = container.cloneNode(true) as HTMLDivElement;
+      
+      const labelNodes = previewNode.querySelectorAll('.prescription-sheet-final');
 
       labelNodes.forEach(labelNode => {
         const sheet = document.createElement('div');
         sheet.className = "print-page";
-        sheet.innerHTML = labelNode.outerHTML;
+        sheet.appendChild(labelNode);
         printableContent.appendChild(sheet);
       });
       
@@ -166,22 +147,13 @@ export default function Home() {
     if (isClient) {
       localStorage.removeItem("pharmaLabelState");
     }
-    const defaultStateWithFollowUp = {
-        ...defaultLabelState,
-        counseling: [
-            ...defaultLabelState.counseling,
-            `• <strong>${convertToBanglaNumerals(defaultLabelState.followUpDays || 7)} দিন</strong> পরে আসবেন।`
-        ]
-    };
-    setLabelState(defaultStateWithFollowUp);
+    setLabelState(defaultLabelState);
   }, [isClient]);
 
   const renderPreviews = useCallback(() => {
     const count = Number(labelState.labelCount) || 1;
     return Array.from({ length: count }, (_, i) => i + 1).map(index => (
-      <div key={index} className="printable-label-wrapper">
-         <LabelPreview {...labelState} activeLabelIndex={index} />
-      </div>
+       <LabelPreview key={index} {...labelState} activeLabelIndex={index} />
     ));
   }, [labelState]);
 
