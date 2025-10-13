@@ -113,7 +113,7 @@ export default function Home() {
     const container = printContainerRef.current;
     if (!container) return;
 
-    // Remove any existing printable content before creating a new one
+    // Clean up any previous print containers
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -124,12 +124,10 @@ export default function Home() {
 
     const labelNodes = container.querySelectorAll('.prescription-sheet-final');
     if (labelNodes.length === 0) return;
-
+    
+    // Clone only the label nodes themselves, without any extra wrappers.
     labelNodes.forEach(labelNode => {
-        const sheet = document.createElement('div');
-        sheet.className = "print-page";
-        sheet.appendChild(labelNode.cloneNode(true));
-        printableContent.appendChild(sheet);
+        printableContent.appendChild(labelNode.cloneNode(true));
     });
 
     document.body.appendChild(printableContent);
@@ -151,7 +149,9 @@ export default function Home() {
   const renderPreviews = useCallback(() => {
     const count = Number(labelState.labelCount) || 1;
     return Array.from({ length: count }, (_, i) => i + 1).map(index => (
-       <LabelPreview key={index} {...labelState} activeLabelIndex={index} />
+       <div key={index} className="printable-label-wrapper">
+         <LabelPreview {...labelState} activeLabelIndex={index} />
+       </div>
     ));
   }, [labelState]);
 
@@ -235,6 +235,3 @@ export default function Home() {
   );
 }
     
-
-    
-

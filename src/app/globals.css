@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -114,7 +115,6 @@
   font-size: 10pt;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: 3.6in;
   height: 5.6in;
   padding: 0.25in;
@@ -210,11 +210,27 @@
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    background-color: white !important;
+  }
+  
+  #printable-content {
+      display: block !important;
   }
 
-  .hide-on-print {
+  .hide-on-print,
+  body > *:not(#printable-content) {
     display: none !important;
+  }
+
+  #printable-content .prescription-sheet-final {
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    page-break-after: always; /* Each label on a new page */
+  }
+
+  /* Hide the wrapper in print view */
+  #printable-content .printable-label-wrapper {
+    display: contents;
   }
   
   @page {
@@ -222,26 +238,8 @@
       margin: 0;
   }
 
-  #printable-content {
-      display: block;
-      width: 100%;
-      height: 100%;
-  }
-
-  .print-page {
-      width: 100%;
-      height: 100%;
-      page-break-after: always;
-  }
-
-  .print-page .prescription-sheet-final {
-      border: none !important;
-      box-shadow: none !important;
-      margin: 0 auto;
-  }
-  
-  .print-page .text-red-700,
-  .print-page .text-indigo-700 {
+  .prescription-sheet-final .text-red-700,
+  .prescription-sheet-final .text-indigo-700 {
     color: #000 !important;
   }
 }
