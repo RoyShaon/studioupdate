@@ -77,7 +77,6 @@ export default function Home() {
           parsedState.counseling = [...defaultCounseling];
         }
         
-        // Ensure intervalMode and mealTime have default values if missing
         if (!parsedState.intervalMode) parsedState.intervalMode = 'hourly';
         if (parsedState.mealTime === undefined) parsedState.mealTime = 'none';
 
@@ -104,7 +103,6 @@ export default function Home() {
     }
   }, []);
 
-  // Save state to local storage whenever it changes
   useEffect(() => {
     if (isClient) {
       try {
@@ -120,13 +118,12 @@ export default function Home() {
     const previewContainer = printContainerRef.current;
     if (!previewContainer) return;
 
-    // Remove any existing printable content to avoid duplicates
-    const existingPrintableContent = document.getElementById('printable-content');
-    if (existingPrintableContent) {
-        document.body.removeChild(existingPrintableContent);
+    let printableContent = document.getElementById('printable-content');
+    if (printableContent) {
+        printableContent.remove();
     }
 
-    const printableContent = document.createElement('div');
+    printableContent = document.createElement('div');
     printableContent.id = 'printable-content';
 
     const labelNodes = previewContainer.querySelectorAll('.prescription-sheet-final');
@@ -145,8 +142,9 @@ export default function Home() {
 
     const handleAfterPrint = () => {
       document.title = originalTitleRef.current;
-      if (printableContent && printableContent.parentNode === document.body) {
-          document.body.removeChild(printableContent);
+      const contentToRemove = document.getElementById('printable-content');
+      if (contentToRemove) {
+          contentToRemove.remove();
       }
       window.removeEventListener('afterprint', handleAfterPrint);
     };

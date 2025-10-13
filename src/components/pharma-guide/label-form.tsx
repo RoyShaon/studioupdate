@@ -175,11 +175,15 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   
   const handleLabelCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const numValue = parseInt(value, 10);
     
     if (value === '') {
         setState(prevState => ({ ...prevState, labelCount: 1 }));
-    } else if (!isNaN(numValue) && numValue > 0) {
+        return;
+    }
+    
+    const numValue = parseInt(value, 10);
+
+    if (!isNaN(numValue) && numValue > 0) {
         setState(prevState => ({ ...prevState, labelCount: numValue }));
     } else if (!isNaN(numValue) && numValue < 1) {
         setState(prevState => ({ ...prevState, labelCount: 1 }));
