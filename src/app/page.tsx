@@ -69,7 +69,7 @@ export default function Home() {
     }
     try {
       const savedState = localStorage.getItem("pharmaLabelState");
-      if (savedState) {
+      if (savedState && savedState.length > 0) {
         const parsedState = JSON.parse(savedState);
         parsedState.date = new Date(parsedState.date);
         
@@ -109,11 +109,10 @@ export default function Home() {
     }
   }, [labelState, isClient]);
   
-  const triggerPrint = useCallback(() => {
+ const triggerPrint = useCallback(() => {
     const container = printContainerRef.current;
     if (!container) return;
 
-    // Clean up any previous print containers
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -125,7 +124,6 @@ export default function Home() {
     const labelNodes = container.querySelectorAll('.prescription-sheet-final');
     if (labelNodes.length === 0) return;
     
-    // Clone only the label nodes themselves, without any extra wrappers.
     labelNodes.forEach(labelNode => {
         printableContent.appendChild(labelNode.cloneNode(true));
     });

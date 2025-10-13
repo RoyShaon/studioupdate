@@ -115,6 +115,7 @@
   font-size: 10pt;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   width: 3.6in;
   height: 5.6in;
   padding: 0.25in;
@@ -212,34 +213,25 @@
     print-color-adjust: exact !important;
   }
   
-  #printable-content {
-      display: block !important;
-  }
-
   .hide-on-print,
   body > *:not(#printable-content) {
     display: none !important;
   }
 
-  #printable-content .prescription-sheet-final {
+  .prescription-sheet-final {
     margin: 0;
     border: none;
     box-shadow: none;
-    page-break-after: always; /* Each label on a new page */
+    page-break-after: always;
   }
 
-  /* Hide the wrapper in print view */
-  #printable-content .printable-label-wrapper {
-    display: contents;
-  }
-  
   @page {
       size: 3.6in 5.6in;
       margin: 0;
   }
-
-  .prescription-sheet-final .text-red-700,
-  .prescription-sheet-final .text-indigo-700 {
+  
+  .prescription-sheet-final,
+  .prescription-sheet-final * {
     color: #000 !important;
   }
 }
