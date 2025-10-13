@@ -152,8 +152,8 @@
 .prescription-sheet-final .instruction-box {
   padding: 0.5rem !important;
   border: 1px dashed #6b7280 !important;
-  line-height: 1.4 !important;
   font-size: 9.4pt !important;
+  line-height: 1.4 !important;
 }
 
 .prescription-sheet-final .instruction-box.instruction-long-text {
@@ -269,7 +269,13 @@
   
   .print-page .prescription-sheet-final .advice-list li {
     font-size: 7.9pt !important;
-    line-height: 1.3;
+    line-height: 1.3 !important;
+  }
+  
+  /* Make all text black for printing */
+  .print-page .text-red-700,
+  .print-page .text-indigo-700 {
+    color: #000 !important;
   }
 
   @page {
@@ -298,3 +304,4 @@
     
 
     
+
