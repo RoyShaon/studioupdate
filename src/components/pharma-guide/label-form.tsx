@@ -96,12 +96,17 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         if(nameInput) {
             const start = nameInput.selectionStart ?? finalTranscriptRef.current.length;
             const end = nameInput.selectionEnd ?? finalTranscriptRef.current.length;
-            const textBefore = finalTranscriptRef.current.substring(0, start);
-            const textAfter = finalTranscriptRef.current.substring(end);
-
-            const newText = textBefore + (interim_transcript || '') + textAfter;
             
-            setState(prevState => ({ ...prevState, patientName: newText }));
+            const currentVal = finalTranscriptRef.current;
+            
+            // If there's a selection, replace it. Otherwise, insert at cursor.
+            const textBefore = currentVal.substring(0, start);
+            const textAfter = currentVal.substring(end);
+
+            const newText = textBefore.trimEnd() + (interim_transcript ? " " + interim_transcript : "") + textAfter;
+            
+            setState(prevState => ({ ...prevState, patientName: newText.trimStart() }));
+
         } else {
              setState(prevState => ({ ...prevState, patientName: finalTranscriptRef.current + interim_transcript}));
         }
@@ -231,7 +236,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   }, [setState]);
 
   useEffect(() => {
-    const followUpDays = state.followUpDays || 7;
+    const followUpDays = state.followUpDays === undefined ? 7 : state.followUpDays;
     const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
     
     setState(prevState => {
@@ -239,18 +244,20 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
       const followUpIndex = counseling.findIndex(c => c.includes("পরে আসবেন"));
       
       if (followUpIndex !== -1) {
+        // If the follow-up text is already there but different, update it
         if (counseling[followUpIndex] !== followUpText) {
           counseling[followUpIndex] = followUpText;
           return {...prevState, counseling };
         }
-      } else if (prevState.followUpDays) {
+      } else if (prevState.followUpDays !== undefined) {
+         // If it's not there, add it
          if (followUpIndex === -1) {
           counseling.push(followUpText);
           return {...prevState, counseling };
         }
       }
 
-      return prevState;
+      return prevState; // No change needed
     });
   }, [state.followUpDays, setState]);
 
@@ -404,7 +411,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                 <Label htmlFor="interval" className="hidden md:inline">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর?</Label>
                 <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
             </div>
-          ) : <div></div>}
+          ) : (state.intervalMode === 'meal-time' ? <div></div> : <div></div>)}
           
           {state.intervalMode === 'meal-time' && (
              <div>

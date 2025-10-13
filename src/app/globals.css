@@ -109,113 +109,99 @@
 
 /* Common styles for both preview and print */
 .prescription-sheet-final {
-  background-color: white !important;
-  color: #000 !important;
-  font-size: 10pt !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  width: 3.6in !important;
-  height: 5.6in !important;
-  padding: 0.25in 0.25in 0.4in 0.25in !important;
-  margin: 0 auto !important; /* Center on screen */
-  border: 1px solid #ccc !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
-  box-sizing: border-box !important;
+  background-color: white;
+  color: #000;
+  font-size: 10pt;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 3.6in;
+  height: 5.6in;
+  padding: 0.25in;
+  margin: 0 auto; /* Center on screen */
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .prescription-sheet-final .text-lg {
-  font-size: 1rem !important;
-  line-height: 1.5rem !important;
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .prescription-sheet-final .text-base {
-  font-size: 11pt !important;
+  font-size: 11pt;
 }
 
 .prescription-sheet-final .text-sm {
-  font-size: 10pt !important;
+  font-size: 10pt;
 }
 
 .prescription-sheet-final .text-xs {
-  font-size: 8.7pt !important;
-}
-
-.prescription-sheet-final .text-red-700 {
-  color: #b91c1c !important;
-}
-
-.prescription-sheet-final .text-indigo-700 {
-  color: #4338ca !important;
+  font-size: 8.7pt;
 }
 
 .prescription-sheet-final .instruction-box {
-  padding: 0.5rem !important;
-  border: 1px dashed #6b7280 !important;
-  font-size: 9.4pt !important;
-  line-height: 1.4 !important;
+  padding: 0.5rem;
+  border: 1px dashed #6b7280;
+  font-size: 9.4pt;
+  line-height: 1.4;
 }
 
 .prescription-sheet-final .instruction-box.instruction-long-text {
-  font-size: 9.1pt !important;
-  line-height: 1.4 !important;
-}
-
-
-.print-page .prescription-sheet-final .instruction-box {
-  border-color: transparent !important;
+  font-size: 9.1pt;
+  line-height: 1.4;
 }
 
 .prescription-sheet-final .advice-list {
-  padding-left: 0 !important;
-  list-style: none !important;
+  padding-left: 0;
+  list-style: none;
 }
 
 .prescription-sheet-final .advice-list li {
-  font-size: 7.9pt !important;
-  line-height: 1.3 !important;
-  margin-bottom: 0 !important;
+  font-size: 7.9pt;
+  line-height: 1.3;
+  margin-bottom: 0;
 }
 
 .prescription-sheet-final .doctor-info {
-  line-height: 1.4 !important;
-  border: none !important;
-  padding: 0 !important;
+  line-height: 1.4;
+  border: none;
+  padding: 0;
 }
 .prescription-sheet-final .doctor-info-with-border {
-    border: 1px solid #ccc !important;
-    padding: 0.25rem !important;
+    border: 1px solid #ccc;
+    padding: 0.25rem;
 }
 
 .prescription-sheet-final .doctor-info p {
-  margin-bottom: 0px !important;
-  line-height: 1.4 !important;
+  margin-bottom: 0px;
+  line-height: 1.4;
 }
 
 .prescription-sheet-final .doctor-info .doctor-title {
-  font-size: 8.7pt !important;
+  font-size: 8.7pt;
 }
 
 .prescription-sheet-final .doctor-info .doctor-subtitle {
-  font-size: 6.2pt !important;
+  font-size: 6.2pt;
 }
 
 .prescription-sheet-final .doctor-info .doctor-name {
-  font-size: 8.7pt !important;
+  font-size: 8.7pt;
 }
 .prescription-sheet-final .doctor-info .doctor-degree {
-    font-size: 5.5pt !important;
+    font-size: 5.5pt;
 }
 
 .prescription-sheet-final .doctor-info .doctor-specialty {
-    font-size: 6.2pt !important;
+    font-size: 6.2pt;
 }
 
 .prescription-sheet-final .doctor-info .doctor-location {
-  font-size: 7.8pt !important;
+  font-size: 7.8pt;
 }
 .prescription-sheet-final .doctor-info .doctor-contact {
-    font-size: 7.8pt !important;
+    font-size: 7.8pt;
 }
 
 
@@ -232,40 +218,38 @@
   
   @page {
       size: 3.6in 5.6in;
-      margin: 0mm;
+      margin: 0;
   }
 
   #printable-content {
       display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
   }
 
   .print-page {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
+      page-break-after: always;
       display: flex;
       align-items: center;
       justify-content: center;
-      page-break-after: always;
   }
 
   .print-page .prescription-sheet-final {
       border: none !important;
       box-shadow: none !important;
-      margin: 0 auto !important;
-  }
-
-  .print-page .advice-list li {
-    font-size: 7.9pt !important;
-    line-height: 1.3 !important;
+      margin: 0 auto;
+      transform-origin: top left;
+      transform: scale(1);
   }
   
   .print-page .text-red-700,
   .print-page .text-indigo-700 {
     color: #000 !important;
+  }
+
+  .print-page .instruction-box {
+    border-color: transparent !important;
   }
 }

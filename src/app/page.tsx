@@ -76,22 +76,25 @@ export default function Home() {
         if (!parsedState.counseling || parsedState.counseling.length === 0) {
           parsedState.counseling = [...defaultCounseling];
         }
-
-        const followUpDays = parsedState.followUpDays || 7;
-        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-        const followUpIndex = parsedState.counseling.findIndex((c: string) => c.includes("পরে আসবেন"));
-        
-        if (followUpIndex > -1) {
-          parsedState.counseling[followUpIndex] = followUpText;
-        } else if (parsedState.followUpDays !== undefined) {
-           parsedState.counseling.push(followUpText);
-        }
         
         if (!parsedState.intervalMode) parsedState.intervalMode = 'hourly';
         if (!parsedState.mealTime) parsedState.mealTime = 'none';
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
         
-        return parsedState;
+        // This part handles the follow-up day logic
+        const followUpDays = parsedState.followUpDays === undefined ? 7 : parsedState.followUpDays;
+        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
+        const followUpIndex = parsedState.counseling.findIndex((c: string) => c.includes("পরে আসবেন"));
+
+        if (followUpIndex > -1) {
+          if (parsedState.counseling[followUpIndex] !== followUpText) {
+             parsedState.counseling[followUpIndex] = followUpText;
+          }
+        } else if (parsedState.followUpDays !== undefined) {
+           parsedState.counseling.push(followUpText);
+        }
+        
+        return { ...defaultLabelState, ...parsedState, followUpDays };
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
@@ -193,7 +196,7 @@ export default function Home() {
   return (
     <main className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hide-on-print">
           <div>
             <h1 className="text-4xl font-bold tracking-tight font-body text-primary">
               ত্রিফুল আরোগ্য নিকেতন
@@ -205,7 +208,7 @@ export default function Home() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          <Card className="lg:col-span-2 shadow-lg">
+          <Card className="lg:col-span-2 shadow-lg hide-on-print">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="font-body">রোগীর তথ্য ও নির্দেশাবলী</CardTitle>
                 <TooltipProvider>
@@ -236,7 +239,7 @@ export default function Home() {
           </Card>
 
           <div className="lg:col-span-3">
-             <Card className="shadow-lg sticky top-8">
+             <Card className="shadow-lg sticky top-8 hide-on-print">
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl font-semibold">ফর্মের প্রিভিউ</CardTitle>
                   <CardDescription>
@@ -244,7 +247,7 @@ export default function Home() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div ref={printContainerRef}>
+                  <div ref={printContainerRef} id="preview-container">
                       {renderPreviews()}
                   </div>
                 </CardContent>
