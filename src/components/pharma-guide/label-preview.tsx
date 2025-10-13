@@ -139,57 +139,55 @@ export default function LabelPreview({
     <div
       className="prescription-sheet-final font-body"
     >
-        <div className="flex flex-col h-full">
-            <div className="space-y-1 pt-2">
-                <div>
-                    <div className="flex justify-between items-center text-sm font-medium mb-1">
-                        <span className="truncate pr-1"><strong>ক্রমিক নং:</strong> <strong className="text-red-700">{serial}</strong></span>
-                        <span className="whitespace-nowrap">তারিখঃ <strong className="text-red-700">{formattedDate}</strong></span>
-                    </div>
-                    <div className="text-left text-base font-medium mb-2">
-                        রোগীর নামঃ&nbsp;&nbsp;<strong className="text-indigo-700">{patientName || ''}</strong>
-                    </div>
+        <div className="space-y-1 pt-2">
+            <div>
+                <div className="flex justify-between items-center text-sm font-medium mb-1">
+                    <span className="truncate pr-1"><strong>ক্রমিক নং:</strong> <strong className="text-red-700">{serial}</strong></span>
+                    <span className="whitespace-nowrap">তারিখঃ <strong className="text-red-700">{formattedDate}</strong></span>
                 </div>
-
-                {getSequentialText()}
-
-                <div className="space-y-1">
-                    <div className="text-center"> 
-                        <h2 className="inline-block border-b-2 border-indigo-700 text-indigo-700 py-0 text-center font-bold" style={{ fontSize: '17px' }}>ঔষধ খাবার নিয়মাবলী</h2>
-                    </div>
-                    {renderInstruction()}
-                </div>
-
-                <div className="space-y-2 pt-1">
-                    <div className="text-center">
-                      <h3 className="text-base font-bold text-red-700 mb-1 inline-block border-b-2 border-red-700">পরামর্শ</h3>
-                      <ul
-                        className="advice-list text-gray-800 pl-0 list-none text-left"
-                        dangerouslySetInnerHTML={{ __html: finalCounseling }}
-                      ></ul>
-                    </div>
+                <div className="text-left text-base font-medium mb-2">
+                    রোগীর নামঃ&nbsp;&nbsp;<strong className="text-indigo-700">{patientName || ''}</strong>
                 </div>
             </div>
-          
-            <div className="flex-grow"></div>
-            <div className="doctor-info text-center mt-2">
-                <div className="doctor-info-with-border inline-block">
-                    <p className="font-bold text-indigo-700 doctor-title">ত্রিফুল আরোগ্য নিকেতন</p>
-                    <p className="doctor-subtitle">(আদর্শ হোমিওপ্যাথিক চিকিৎসালয়)</p>
-                    <p className="doctor-name">
-                    <strong style={{ fontWeight: '500' }}>ডাঃ নীহার রঞ্জন রায়</strong> <span className="doctor-degree" style={{ fontWeight: '500' }}>(বি.এস.সি, ডি.এইচ.এম.এস)</span>
-                    </p>
-                    <p className="doctor-specialty">(শুধুমাত্র জটিল ও পুরাতন রোগী চিকিৎসক)</p>
-                    <p className="doctor-location">কোটালীপাড়া, গোপালগঞ্জ</p>
-                    <p className="font-bold doctor-contact">
-                    মোবাইল:&nbsp;
-                    01716-954699, 01922-788466, 01714-719422
-                    </p>
+
+            {getSequentialText()}
+
+            <div className="space-y-1">
+                <div className="text-center"> 
+                    <h2 className="inline-block border-b-2 border-indigo-700 text-indigo-700 py-0 text-center font-bold" style={{ fontSize: '17px' }}>ঔষধ খাবার নিয়মাবলী</h2>
                 </div>
+                {renderInstruction()}
+            </div>
+
+            <div className="space-y-2 pt-1">
+                <div className="text-center">
+                  <h3 className="text-base font-bold text-red-700 mb-1 inline-block border-b-2 border-red-700">পরামর্শ</h3>
+                  <ul
+                    className="advice-list text-gray-800 pl-0 list-none text-left"
+                    dangerouslySetInnerHTML={{ __html: finalCounseling }}
+                  ></ul>
+                </div>
+            </div>
+        </div>
+      
+        <div className="doctor-info text-center mt-2">
+            <div className="doctor-info-with-border inline-block">
+                <p className="font-bold text-indigo-700 doctor-title">ত্রিফুল আরোগ্য নিকেতন</p>
+                <p className="doctor-subtitle">(আদর্শ হোমিওপ্যাথিক চিকিৎসালয়)</p>
+                <p className="doctor-name">
+                <strong style={{ fontWeight: '500' }}>ডাঃ নীহার রঞ্জন রায়</strong> <span className="doctor-degree" style={{ fontWeight: '500' }}>(বি.এস.সি, ডি.এইচ.এম.এস)</span>
+                </p>
+                <p className="doctor-specialty">(শুধুমাত্র জটিল ও পুরাতন রোগী চিকিৎসক)</p>
+                <p className="doctor-location">কোটালীপাড়া, গোপালগঞ্জ</p>
+                <p className="font-bold doctor-contact">
+                মোবাইল:&nbsp;
+                01716-954699, 01922-788466, 01714-719422
+                </p>
             </div>
         </div>
     </div>
   );
 }
+
 
 
