@@ -110,33 +110,37 @@ export default function Home() {
   }, [labelState, isClient]);
   
   const triggerPrint = useCallback(() => {
-      const container = printContainerRef.current;
-      if (!container) return;
+    const container = printContainerRef.current;
+    if (!container) return;
 
-      const existingPrintableContent = document.getElementById('printable-content');
-      if (existingPrintableContent) {
+    const existingPrintableContent = document.getElementById('printable-content');
+    if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
-      }
-      
-      const printableContent = document.createElement('div');
-      printableContent.id = 'printable-content';
-      
-      const previewNode = container.cloneNode(true) as HTMLDivElement;
-      
-      const labelNodes = previewNode.querySelectorAll('.prescription-sheet-final');
+    }
 
-      labelNodes.forEach(labelNode => {
-        const sheet = document.createElement('div');
-        sheet.className = "print-page";
-        sheet.appendChild(labelNode);
-        printableContent.appendChild(sheet);
-      });
-      
-      if (printableContent.hasChildNodes()) {
+    const printableContent = document.createElement('div');
+    printableContent.id = 'printable-content';
+    printableContent.innerHTML = container.innerHTML;
+
+    if (printableContent.hasChildNodes()) {
         document.body.appendChild(printableContent);
+        
+        const labelNodes = printableContent.querySelectorAll('.prescription-sheet-final');
+        const printPagesContainer = document.createElement('div');
+        
+        labelNodes.forEach(labelNode => {
+            const sheet = document.createElement('div');
+            sheet.className = "print-page";
+            sheet.appendChild(labelNode.cloneNode(true));
+            printPagesContainer.appendChild(sheet);
+        });
+        
+        printableContent.innerHTML = '';
+        printableContent.appendChild(printPagesContainer);
+        
         window.print();
         document.body.removeChild(printableContent);
-      }
+    }
   }, []);
 
   const handlePrint = useCallback(() => {
