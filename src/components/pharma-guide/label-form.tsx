@@ -68,7 +68,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
   const transcriptRef = useRef<string>("");
-  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>;
 
   // Initialize counseling in state
   useEffect(() => {
@@ -194,32 +194,38 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     setState(prevState => ({ ...prevState, [name]: isNaN(numValue) ? undefined : numValue }));
   }, [setState]);
   
-  const handleLabelCountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleLabelCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
     const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue > 0) {
-      setState(prevState => ({ ...prevState, [name]: numValue }));
+    
+    if (value === '') {
+        setState(prevState => ({ ...prevState, labelCount: 1 }));
+    } else if (!isNaN(numValue) && numValue > 0) {
+        setState(prevState => ({ ...prevState, labelCount: numValue }));
     } else {
-      setState(prevState => ({ ...prevState, [name]: value === '' ? 1 : (parseInt(value, 10) || 1) }));
+        setState(prevState => ({ ...prevState, labelCount: 1 }));
     }
-  }, [setState]);
+  };
   
   const addNewCounselingItem = useCallback((newItem: string) => {
-    if (newItem && !state.counseling.includes(newItem)) {
-      setState(prevState => {
-        const currentCounseling = [...prevState.counseling];
-        const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
-        const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
-        
-        const newCounselingList = [newItem, ...currentCounseling];
-        if (followUpItem) {
-          newCounselingList.push(followUpItem);
-        }
-        
-        return { ...prevState, counseling: newCounselingList };
-      });
+    if (newItem && !state.counseling.find(item => item.replace(/<strong>(.*?)<\/strong>/g, '$1') === newItem.replace(/<strong>(.*?)<\/strong>/g, '$1'))) {
+        setState(prevState => {
+            const currentCounseling = [...prevState.counseling];
+            const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
+            
+            const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
+
+            const newCounselingList = [newItem, ...currentCounseling];
+
+            if (followUpItem) {
+                newCounselingList.push(followUpItem);
+            }
+            
+            return { ...prevState, counseling: newCounselingList };
+        });
     }
-  }, [state.counseling, setState]);
+}, [state.counseling, setState]);
+
 
   const addCounseling = useCallback(() => {
     addNewCounselingItem(selectedCounseling);
@@ -253,7 +259,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
             <Label htmlFor="serial">ক্রমিক নং</Label>
             <Input id="serial" name="serial" value={state.serial} onChange={handleInputChange} />
@@ -334,22 +340,25 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
       </div>
       
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
             {state.shakeMode === 'with' && (
                 <div>
-                    <Label htmlFor="shakeCount">কত বার ঝাঁকি দিবেন?</Label>
+                    <Label htmlFor="shakeCount" className="md:hidden">ঝাঁকি (বার)</Label>
+                    <Label htmlFor="shakeCount" className="hidden md:inline">কত বার ঝাঁকি দিবেন?</Label>
                     <Input id="shakeCount" name="shakeCount" type="number" value={state.shakeCount ?? ''} onChange={handleNumberChange} min="1" />
                 </div>
             )}
             <div>
-                <Label htmlFor="drops">কত ফোঁটা করে খাবেন?</Label>
+                <Label htmlFor="drops" className="md:hidden">ফোঁটা (পরিমাণ)</Label>
+                <Label htmlFor="drops" className="hidden md:inline">কত ফোঁটা করে খাবেন?</Label>
                 <Input id="drops" name="drops" type="number" value={state.drops ?? ''} onChange={handleNumberChange} min="1" />
             </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="cupAmount">জলের পরিমাণ</Label>
+            <Label htmlFor="cupAmount" className="md:hidden">জল</Label>
+            <Label htmlFor="cupAmount" className="hidden md:inline">জলের পরিমাণ</Label>
             <Select
                 name="cupAmount"
                 value={state.cupAmount}
@@ -365,7 +374,8 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             </Select>
           </div>
            <div>
-              <Label htmlFor="intervalMode">খাওয়ার সময়</Label>
+              <Label htmlFor="intervalMode" className="md:hidden">সময় (অন্তর)</Label>
+              <Label htmlFor="intervalMode" className="hidden md:inline">খাওয়ার সময়</Label>
               <Select
                   name="intervalMode"
                   value={state.intervalMode}
@@ -382,17 +392,19 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
               </Select>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div className="grid grid-cols-2 gap-4">
           {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
             <div>
-                <Label htmlFor="interval">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর খাবেন?</Label>
+                <Label htmlFor="interval" className="md:hidden">অন্তর (সময়)</Label>
+                <Label htmlFor="interval" className="hidden md:inline">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর?</Label>
                 <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
             </div>
           )}
           
           <div>
-              <Label htmlFor="mealTime">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
+              <Label htmlFor="mealTime" className="md:hidden">নির্দিষ্ট সময়</Label>
+              <Label htmlFor="mealTime" className="hidden md:inline">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
               <Select
                   name="mealTime"
                   value={state.mealTime}
@@ -415,9 +427,10 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-              <Label htmlFor="mixtureAmount">কিভাবে খাবেন?</Label>
+              <Label htmlFor="mixtureAmount" className="md:hidden">কিভাবে?</Label>
+              <Label htmlFor="mixtureAmount" className="hidden md:inline">কিভাবে খাবেন?</Label>
               <Select
                   name="mixtureAmount"
                   value={state.mixtureAmount}
@@ -435,14 +448,16 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                 </Select>
           </div>
           <div>
-              <Label htmlFor="durationDays">কত দিন খাবেন?</Label>
+              <Label htmlFor="durationDays" className="md:hidden">কত দিন?</Label>
+              <Label htmlFor="durationDays" className="hidden md:inline">কত দিন খাবেন?</Label>
               <Input id="durationDays" name="durationDays" type="number" value={state.durationDays ?? ''} onChange={handleNumberChange} min="1" />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4">
             <div>
-                <Label htmlFor="labelCount">কতগুলো লেবেল?</Label>
+                <Label htmlFor="labelCount" className="md:hidden">লেবেল (সংখ্যা)</Label>
+                <Label htmlFor="labelCount" className="hidden md:inline">কতগুলো লেবেল?</Label>
                 <Input 
                     id="labelCount"
                     name="labelCount"
@@ -459,7 +474,8 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                 />
             </div>
              <div>
-                <Label htmlFor="followUpDays">কত দিন পরে আসবেন?</Label>
+                <Label htmlFor="followUpDays" className="md:hidden">পুনরায় আসবেন (দিন)</Label>
+                <Label htmlFor="followUpDays" className="hidden md:inline">কত দিন পরে আসবেন?</Label>
                 <Input id="followUpDays" name="followUpDays" type="number" value={state.followUpDays ?? ''} onChange={handleNumberChange} min="1" />
             </div>
         </div>
@@ -531,3 +547,5 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
