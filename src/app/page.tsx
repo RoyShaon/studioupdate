@@ -92,9 +92,14 @@ export default function Home() {
   
   const [isClient, setIsClient] = useState(false);
   const printContainerRef = useRef<HTMLDivElement>(null);
+  const originalTitleRef = useRef(typeof document !== 'undefined' ? document.title : '');
+
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof document !== 'undefined') {
+      originalTitleRef.current = document.title;
+    }
   }, []);
 
   // Save state to local storage whenever it changes
@@ -120,7 +125,7 @@ export default function Home() {
 
     const printableContent = document.createElement('div');
     printableContent.id = 'printable-content';
-
+    
     const labelNodes = container.querySelectorAll('.prescription-sheet-final');
     if (labelNodes.length === 0) return;
     
@@ -129,9 +134,23 @@ export default function Home() {
     });
 
     document.body.appendChild(printableContent);
+
+    if (labelState.patientName) {
+      document.title = labelState.patientName;
+    }
+
+    const handleAfterPrint = () => {
+      document.title = originalTitleRef.current;
+      if (printableContent.parentNode === document.body) {
+          document.body.removeChild(printableContent);
+      }
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+    
+    window.addEventListener('afterprint', handleAfterPrint);
+
     window.print();
-    document.body.removeChild(printableContent);
-  }, []);
+  }, [labelState.patientName]);
 
   const handlePrint = useCallback(() => {
     triggerPrint();
@@ -233,3 +252,4 @@ export default function Home() {
   );
 }
     
+
