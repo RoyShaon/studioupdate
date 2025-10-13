@@ -35,7 +35,7 @@ interface LabelFormProps {
 const predefinedCounseling: string[] = [
   "• ঔষধ সেবনকালীন যাবতীয় ঔষধি নিষিদ্ধ।",
   "• ঔষধ সেবনের আধা ঘন্টা আগে-পরে জল ব্যতিত কোন খাবার খাবেন না।",
-  "• জরুরী প্রয়োজনে <strong>বিকাল ৫টা থেকে ৭টার মধ্যে</strong> ফোন করুন।",
+  "• জরুরী প্রয়োজনে বিকাল <strong>৫টা</strong> থেকে <strong>৭টার</strong> মধ্যে ফোন করুন।",
   `• <strong>৭ দিন</strong> পরে আসবেন।`,
   "• টক জাতীয় খাবার খাবেন না।",
   "• কাঁচা পিয়াজ-রসুন খাবেন না।",
@@ -50,7 +50,7 @@ const predefinedCounseling: string[] = [
 const defaultCounselingItems = [
   "• ঔষধ সেবনকালীন যাবতীয় ঔষধি নিষিদ্ধ।",
   "• ঔষধ সেবনের আধা ঘন্টা আগে-পরে জল ব্যতিত কোন খাবার খাবেন না।",
-  "• জরুরী প্রয়োজনে <strong>বিকাল ৫টা থেকে ৭টার মধ্যে</strong> ফোন করুন।",
+  "• জরুরী প্রয়োজনে বিকাল <strong>৫টা</strong> থেকে <strong>৭টার</strong> মধ্যে ফোন করুন।",
   `• <strong>৭ দিন</strong> পরে আসবেন।`,
 ];
 
@@ -68,22 +68,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
   const transcriptRef = useRef<string>("");
-  const silenceTimerRef = useRef<NodeJS.Timeout | null>;
-
-  // Initialize counseling in state
-  useEffect(() => {
-    if (!state.counseling || state.counseling.length === 0) {
-      const followUpDays = state.followUpDays || 7;
-      const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-      const initialCounseling = defaultCounselingItems.map(item =>
-        item.includes("পরে আসবেন") ? followUpText : item
-      );
-      setState(prevState => ({
-        ...prevState,
-        counseling: initialCounseling
-      }));
-    }
-  }, [setState, state.counseling, state.followUpDays]);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 
   useEffect(() => {
@@ -402,29 +387,30 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             </div>
           )}
           
-          <div>
-              <Label htmlFor="mealTime" className="md:hidden">নির্দিষ্ট সময়</Label>
-              <Label htmlFor="mealTime" className="hidden md:inline">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
-              <Select
-                  name="mealTime"
-                  value={state.mealTime}
-                  onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
-                  disabled={state.intervalMode === 'meal-time'}
-              >
-                  <SelectTrigger>
-                      <SelectValue placeholder="নির্বাচন করুন..."/>
-                  </SelectTrigger>
-                  <SelectContent>
-                      <SelectItem value="none">কোনোটিই নয়</SelectItem>
-                      <SelectItem value="morning">সকালে</SelectItem>
-                      <SelectItem value="noon">দুপুরে</SelectItem>
-                      <SelectItem value="afternoon">বিকালে</SelectItem>
-                      <SelectItem value="night">রাতে</SelectItem>
-                      <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
-                      <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
-                  </SelectContent>
-                </Select>
-          </div>
+          {state.intervalMode === 'meal-time' && (
+             <div>
+                <Label htmlFor="mealTime" className="md:hidden">নির্দিষ্ট সময়</Label>
+                <Label htmlFor="mealTime" className="hidden md:inline">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
+                <Select
+                    name="mealTime"
+                    value={state.mealTime}
+                    onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="নির্বাচন করুন..."/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="none">কোনোটিই নয়</SelectItem>
+                        <SelectItem value="morning">সকালে</SelectItem>
+                        <SelectItem value="noon">দুপুরে</SelectItem>
+                        <SelectItem value="afternoon">বিকালে</SelectItem>
+                        <SelectItem value="night">রাতে</SelectItem>
+                        <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
+                        <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
+                    </SelectContent>
+                  </Select>
+            </div>
+          )}
         </div>
         
         <div className="grid grid-cols-2 gap-4">
@@ -547,5 +533,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
 
     

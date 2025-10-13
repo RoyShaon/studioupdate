@@ -41,7 +41,7 @@ export type LabelState = {
 const defaultCounseling = [
   "• ঔষধ সেবনকালীন যাবতীয় ঔষধি নিষিদ্ধ।",
   "• ঔষধ সেবনের আধা ঘন্টা আগে-পরে জল ব্যতিত কোন খাবার খাবেন না।",
-  "• জরুরী প্রয়োজনে <strong>বিকাল ৫টা থেকে ৭টার মধ্যে</strong> ফোন করুন।",
+  "• জরুরী প্রয়োজনে বিকাল <strong>৫টা</strong> থেকে <strong>৭টার</strong> মধ্যে ফোন করুন।",
   "• <strong>৭ দিন</strong> পরে আসবেন।"
 ];
 
@@ -64,43 +64,42 @@ const defaultLabelState: LabelState = {
 };
 
 export default function Home() {
-  const [labelState, setLabelState] = useState<LabelState>(defaultLabelState);
-  
-  const [isClient, setIsClient] = useState(false);
-  const printContainerRef = useRef<HTMLDivElement>(null);
-
-  // Load state from local storage on initial render
-  useEffect(() => {
-    setIsClient(true);
+  const [labelState, setLabelState] = useState<LabelState>(() => {
+    if (typeof window === 'undefined') {
+      return defaultLabelState;
+    }
     try {
       const savedState = localStorage.getItem("pharmaLabelState");
       if (savedState) {
         const parsedState = JSON.parse(savedState);
-        // Ensure date is a Date object
         parsedState.date = new Date(parsedState.date);
         
-        // If counseling is empty or not present in saved state, set default
         if (!parsedState.counseling || parsedState.counseling.length === 0) {
           parsedState.counseling = defaultCounseling;
         }
         
-        // Set default interval mode if not present
         if (!parsedState.intervalMode) {
           parsedState.intervalMode = 'hourly';
         }
-         if (!parsedState.mealTime) {
+        if (!parsedState.mealTime) {
           parsedState.mealTime = 'none';
         }
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) {
           parsedState.labelCount = 1;
         }
-
-
-        setLabelState(parsedState);
+        return parsedState;
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
     }
+    return defaultLabelState;
+  });
+  
+  const [isClient, setIsClient] = useState(false);
+  const printContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsClient(true);
   }, []);
 
   // Save state to local storage whenever it changes
@@ -176,8 +175,10 @@ export default function Home() {
           return {...prevState, counseling };
         }
       } else if (prevState.followUpDays) {
-        counseling.push(followUpText);
-        return {...prevState, counseling };
+         if (followUpIndex === -1) {
+          counseling.push(followUpText);
+          return {...prevState, counseling };
+        }
       }
 
       return prevState;
@@ -266,4 +267,6 @@ export default function Home() {
     </main>
   );
 }
+    
+
     
