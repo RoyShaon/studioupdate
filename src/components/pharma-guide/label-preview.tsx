@@ -95,6 +95,9 @@ export default function LabelPreview({
     }
     
     let processedInstruction = convertToBanglaNumerals(instruction);
+     if (timeText && intervalText) {
+      processedInstruction = processedInstruction.replace(' অন্তর অন্তর ', ' অন্তর ');
+    }
     
     return (
       <div 

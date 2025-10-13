@@ -266,6 +266,7 @@
   
   .print-page .prescription-sheet-final .advice-list li {
     font-size: 8.4pt !important;
+    line-height: 1.35;
   }
 
   @page {
@@ -275,6 +276,7 @@
 }
 
     
+
 
 
 
