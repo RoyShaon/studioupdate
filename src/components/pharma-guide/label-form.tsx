@@ -228,10 +228,17 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   
   const handleIntervalModeChange = useCallback((value: IntervalMode) => {
     setState(prev => {
+        let newState = {...prev, intervalMode: value};
         if (value === 'meal-time') {
-            return {...prev, intervalMode: value, mealTime: 'morning', interval: undefined};
+            newState.mealTime = 'morning';
+            newState.interval = undefined;
+        } else {
+            newState.mealTime = 'none';
+            if(prev.interval === undefined) {
+               newState.interval = 12;
+            }
         }
-        return {...prev, intervalMode: value, mealTime: 'none'};
+        return newState;
     });
   }, [setState]);
 
@@ -406,42 +413,41 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         </div>
         
         <div className="grid grid-cols-2 gap-4">
-          {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') ? (
-            <div>
-                <Label htmlFor="interval" className="md:hidden">অন্তর (সময়)</Label>
-                <Label htmlFor="interval" className="hidden md:inline">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর?</Label>
-                <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
+            <div className="grid-item">
+                {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
+                    <div>
+                        <Label htmlFor="interval" className="md:hidden">অন্তর (সময়)</Label>
+                        <Label htmlFor="interval" className="hidden md:inline">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর?</Label>
+                        <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
+                    </div>
+                )}
+                {state.intervalMode === 'meal-time' && (
+                    <div>
+                        <Label htmlFor="mealTime" className="md:hidden">নির্দিষ্ট সময়</Label>
+                        <Label htmlFor="mealTime" className="hidden md:inline">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
+                        <Select
+                            name="mealTime"
+                            value={state.mealTime}
+                            onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="নির্বাচন করুন..."/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">কোনোটিই নয়</SelectItem>
+                                <SelectItem value="morning">সকালে</SelectItem>
+                                <SelectItem value="noon">দুপুরে</SelectItem>
+                                <SelectItem value="afternoon">বিকালে</SelectItem>
+                                <SelectItem value="night">রাতে</SelectItem>
+                                <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
+                                <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
             </div>
-          ) : (state.intervalMode === 'meal-time' ? <div></div> : <div></div>)}
-          
-          {state.intervalMode === 'meal-time' && (
-             <div>
-                <Label htmlFor="mealTime" className="md:hidden">নির্দিষ্ট সময়</Label>
-                <Label htmlFor="mealTime" className="hidden md:inline">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
-                <Select
-                    name="mealTime"
-                    value={state.mealTime}
-                    onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="নির্বাচন করুন..."/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="none">কোনোটিই নয়</SelectItem>
-                        <SelectItem value="morning">সকালে</SelectItem>
-                        <SelectItem value="noon">দুপুরে</SelectItem>
-                        <SelectItem value="afternoon">বিকালে</SelectItem>
-                        <SelectItem value="night">রাতে</SelectItem>
-                        <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
-                        <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
-                    </SelectContent>
-                  </Select>
-            </div>
-          )}
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
+            
+            <div className="grid-item">
               <Label htmlFor="mixtureAmount" className="md:hidden">কিভাবে?</Label>
               <Label htmlFor="mixtureAmount" className="hidden md:inline">কিভাবে খাবেন?</Label>
               <Select
@@ -459,15 +465,15 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                       <SelectItem value="সবটুকু ঔষধ">সবটুকু ঔষধ</SelectItem>
                   </SelectContent>
                 </Select>
-          </div>
+            </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
           <div>
               <Label htmlFor="durationDays" className="md:hidden">কত দিন?</Label>
               <Label htmlFor="durationDays" className="hidden md:inline">কত দিন খাবেন?</Label>
               <Input id="durationDays" name="durationDays" type="number" value={state.durationDays ?? ''} onChange={handleNumberChange} min="1" />
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
             <div>
                 <Label htmlFor="labelCount" className="md:hidden">লেবেল (সংখ্যা)</Label>
                 <Label htmlFor="labelCount" className="hidden md:inline">কতগুলো লেবেল?</Label>
@@ -480,6 +486,8 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                     min="1"
                 />
             </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
              <div>
                 <Label htmlFor="followUpDays" className="md:hidden">পুনরায় আসবেন (দিন)</Label>
                 <Label htmlFor="followUpDays" className="hidden md:inline">কত দিন পরে আসবেন?</Label>

@@ -118,7 +118,6 @@ export default function Home() {
     const container = printContainerRef.current;
     if (!container) return;
 
-    // Remove any existing printable content before creating a new one
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -126,12 +125,13 @@ export default function Home() {
 
     const printableContent = document.createElement('div');
     printableContent.id = 'printable-content';
-    
+
     const labelNodes = container.querySelectorAll('.prescription-sheet-final');
     if (labelNodes.length === 0) return;
-    
+
     labelNodes.forEach(labelNode => {
-        printableContent.appendChild(labelNode.cloneNode(true));
+        const clone = labelNode.cloneNode(true);
+        printableContent.appendChild(clone);
     });
 
     document.body.appendChild(printableContent);
@@ -152,6 +152,7 @@ export default function Home() {
 
     window.print();
   }, [labelState.patientName]);
+
 
   const handlePrint = useCallback(() => {
     triggerPrint();
