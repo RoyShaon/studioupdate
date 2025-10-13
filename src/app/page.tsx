@@ -253,7 +253,7 @@ export default function Home() {
                   </div>
                 </CardContent>
                  <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6">
-                    <Button onClick={handlePrint} className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50">
+                    <Button onClick={handlePrint} className="text-white font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-primary/50">
                       <Printer className="mr-2 h-4 w-4" />
                       প্রিন্ট করুন
                     </Button>
@@ -285,5 +285,7 @@ export default function Home() {
 
 
 
+
+    
 
     
