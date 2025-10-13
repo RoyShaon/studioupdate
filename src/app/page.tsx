@@ -81,20 +81,7 @@ export default function Home() {
         if (!parsedState.mealTime) parsedState.mealTime = 'none';
         if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
         
-        // This part handles the follow-up day logic
-        const followUpDays = parsedState.followUpDays === undefined ? 7 : parsedState.followUpDays;
-        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
-        const followUpIndex = parsedState.counseling.findIndex((c: string) => c.includes("পরে আসবেন"));
-
-        if (followUpIndex > -1) {
-          if (parsedState.counseling[followUpIndex] !== followUpText) {
-             parsedState.counseling[followUpIndex] = followUpText;
-          }
-        } else if (parsedState.followUpDays !== undefined) {
-           parsedState.counseling.push(followUpText);
-        }
-        
-        return { ...defaultLabelState, ...parsedState, followUpDays };
+        return { ...defaultLabelState, ...parsedState };
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
@@ -131,6 +118,11 @@ export default function Home() {
   }, [labelState, isClient]);
   
   const triggerPrint = useCallback(() => {
+      const existingPrintableContent = document.getElementById('printable-content');
+      if (existingPrintableContent) {
+        document.body.removeChild(existingPrintableContent);
+      }
+
       const container = printContainerRef.current;
       if (!container) return;
 
@@ -142,10 +134,7 @@ export default function Home() {
       previews.forEach(previewNode => {
         const sheet = document.createElement('div');
         sheet.className = "print-page";
-
-        const content = previewNode.cloneNode(true) as HTMLElement;
-        sheet.appendChild(content);
-
+        sheet.innerHTML = previewNode.innerHTML;
         printableContent.appendChild(sheet);
       });
 
@@ -191,8 +180,6 @@ export default function Home() {
     );
   }
   
-  const currentLabelCount = Number(labelState.labelCount) || 1;
-
   return (
     <main className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
