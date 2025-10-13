@@ -208,21 +208,37 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   
   const addCounseling = useCallback(() => {
       if (selectedCounseling && !state.counseling.includes(selectedCounseling)) {
-          setState(prevState => ({
-              ...prevState,
-              counseling: [...prevState.counseling, selectedCounseling]
-          }));
+          setState(prevState => {
+              const currentCounseling = [...prevState.counseling];
+              const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
+              const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
+              
+              const newCounselingList = [selectedCounseling, ...currentCounseling];
+              if (followUpItem) {
+                newCounselingList.push(followUpItem);
+              }
+              
+              return { ...prevState, counseling: newCounselingList };
+          });
       }
   }, [selectedCounseling, state.counseling, setState]);
   
   const addCustomCounseling = useCallback(() => {
     if (customCounseling.trim() !== "") {
-        const newCounseling = customCounseling.trim().startsWith('•') ? customCounseling.trim() : `• ${customCounseling.trim()}`;
-        if (!state.counseling.includes(newCounseling)) {
-            setState(prevState => ({
-                ...prevState,
-                counseling: [...prevState.counseling, newCounseling]
-            }));
+        const newCounselingItem = customCounseling.trim().startsWith('•') ? customCounseling.trim() : `• ${customCounseling.trim()}`;
+        if (!state.counseling.includes(newCounselingItem)) {
+            setState(prevState => {
+              const currentCounseling = [...prevState.counseling];
+              const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
+              const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
+
+              const newCounselingList = [newCounselingItem, ...currentCounseling];
+              if (followUpItem) {
+                newCounselingList.push(followUpItem);
+              }
+
+              return { ...prevState, counseling: newCounselingList };
+            });
             setCustomCounseling("");
         }
     }
@@ -378,11 +394,9 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         </div>
 
         {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                  <Label htmlFor="interval">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর খাবেন?</Label>
-                  <Input id="interval" name="interval" type="number" value={state.interval} onChange={handleNumberChange} min="1" />
-              </div>
+          <div>
+              <Label htmlFor="interval">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর খাবেন?</Label>
+              <Input id="interval" name="interval" type="number" value={state.interval} onChange={handleNumberChange} min="1" />
           </div>
         )}
         
@@ -525,7 +539,3 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
-
-    
-
-    
