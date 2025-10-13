@@ -39,7 +39,7 @@ export default function LabelPreview({
   const finalCounseling = counselingPoints;
     
   const renderInstruction = () => {
-    const bnDrops = drops !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(drops)} ফোঁটা</strong>` : '___';
+    const bnDrops = drops ? `<strong class="text-red-700">${convertToBanglaNumerals(drops)} ফোঁটা</strong>` : '___';
     
     let timeText = '';
     if (mealTime !== 'none') {
@@ -55,7 +55,7 @@ export default function LabelPreview({
     
     let intervalText = '';
     if ((intervalMode === 'hourly' || intervalMode === 'daily')) {
-        if (interval !== '') {
+        if (interval) {
             const bnIntervalNumber = convertToBanglaNumerals(interval);
             const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
             const suffix = timeText ? ' অন্তর' : ' অন্তর অন্তর';
@@ -78,14 +78,14 @@ export default function LabelPreview({
         finalTimeInstruction = "___";
     }
 
-    const bnShakeCount = shakeMode === 'with' && shakeCount !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(shakeCount)} বার</strong>` : '___';
+    const bnShakeCount = shakeMode === 'with' && shakeCount ? `<strong class="text-red-700">${convertToBanglaNumerals(shakeCount)} বার</strong>` : '___';
     
     let bnMixtureAmount = `<strong class="text-red-700">${convertToBanglaNumerals(mixtureAmount.replace(' ঔষধ', ''))}</strong>`;
      if (!mixtureAmount.includes('সবটুকু')) {
         bnMixtureAmount = `${bnMixtureAmount.replace('১', '১&zwnj;')} ঔষধ`;
     }
 
-    const bnDurationDays = durationDays !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(durationDays)} দিন</strong>` : '___';
+    const bnDurationDays = durationDays ? `<strong class="text-red-700">${convertToBanglaNumerals(durationDays)} দিন</strong>` : '___';
     
     const bnCupAmount = cupAmount === 'one_cup' ? 'এক কাপ' : 'আধা কাপ';
     const highlightedCupAmount = `<strong class="text-red-700">${bnCupAmount}</strong>`;

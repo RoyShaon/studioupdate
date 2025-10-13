@@ -27,17 +27,17 @@ export type LabelState = {
   patientName: string;
   date: Date;
   shakeMode: "with" | "without";
-  drops: number | '';
+  drops: number | undefined;
   cupAmount: "one_cup" | "half_cup";
-  shakeCount: number | '';
+  shakeCount: number | undefined;
   intervalMode: IntervalMode;
-  interval: number | '';
+  interval: number | undefined;
   mealTime: MealTime;
   mixtureAmount: string;
-  durationDays: number | '';
+  durationDays: number | undefined;
   counseling: string[];
-  labelCount: number | '';
-  followUpDays: number | '';
+  labelCount: number;
+  followUpDays: number | undefined;
 };
 
 const defaultCounseling = [
@@ -94,6 +94,10 @@ export default function Home() {
          if (!parsedState.mealTime) {
           parsedState.mealTime = 'none';
         }
+        if (parsedState.labelCount === undefined || parsedState.labelCount < 1) {
+          parsedState.labelCount = 1;
+        }
+
 
         setLabelState(parsedState);
       }
@@ -277,17 +281,4 @@ export default function Home() {
     </main>
   );
 }
-    
-
-    
-
-    
-
-
-
-
-    
-
-    
-
     

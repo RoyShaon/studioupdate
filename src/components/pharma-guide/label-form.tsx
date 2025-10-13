@@ -187,17 +187,17 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
   const handleNumberChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (value === '') {
-      setState(prevState => ({ ...prevState, [name]: '' }));
+      setState(prevState => ({ ...prevState, [name]: undefined }));
       return;
     }
     const numValue = parseInt(value, 10);
-    setState(prevState => ({ ...prevState, [name]: isNaN(numValue) ? '' : numValue }));
+    setState(prevState => ({ ...prevState, [name]: isNaN(numValue) ? undefined : numValue }));
   }, [setState]);
   
   const handleLabelCountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
      if (value === '' || parseInt(value, 10) < 1) {
-      setState(prevState => ({ ...prevState, [name]: value === '' ? '' : 1 }));
+      setState(prevState => ({ ...prevState, [name]: value === '' ? 1 : 1 }));
       return;
     }
     const numValue = parseInt(value, 10);
@@ -206,43 +206,35 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     }
   }, [setState]);
   
+  const addNewCounselingItem = useCallback((newItem: string) => {
+    if (newItem && !state.counseling.includes(newItem)) {
+      setState(prevState => {
+        const currentCounseling = [...prevState.counseling];
+        const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
+        const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
+        
+        const newCounselingList = [newItem, ...currentCounseling];
+        if (followUpItem) {
+          newCounselingList.push(followUpItem);
+        }
+        
+        return { ...prevState, counseling: newCounselingList };
+      });
+    }
+  }, [state.counseling, setState]);
+
   const addCounseling = useCallback(() => {
-      if (selectedCounseling && !state.counseling.includes(selectedCounseling)) {
-          setState(prevState => {
-              const currentCounseling = [...prevState.counseling];
-              const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
-              const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
-              
-              const newCounselingList = [selectedCounseling, ...currentCounseling];
-              if (followUpItem) {
-                newCounselingList.push(followUpItem);
-              }
-              
-              return { ...prevState, counseling: newCounselingList };
-          });
-      }
-  }, [selectedCounseling, state.counseling, setState]);
-  
+    addNewCounselingItem(selectedCounseling);
+  }, [selectedCounseling, addNewCounselingItem]);
+
   const addCustomCounseling = useCallback(() => {
     if (customCounseling.trim() !== "") {
-        const newCounselingItem = customCounseling.trim().startsWith('•') ? customCounseling.trim() : `• ${customCounseling.trim()}`;
-        if (!state.counseling.includes(newCounselingItem)) {
-            setState(prevState => {
-              const currentCounseling = [...prevState.counseling];
-              const followUpIndex = currentCounseling.findIndex(c => c.includes("পরে আসবেন"));
-              const followUpItem = followUpIndex > -1 ? currentCounseling.splice(followUpIndex, 1)[0] : null;
-
-              const newCounselingList = [newCounselingItem, ...currentCounseling];
-              if (followUpItem) {
-                newCounselingList.push(followUpItem);
-              }
-
-              return { ...prevState, counseling: newCounselingList };
-            });
-            setCustomCounseling("");
-        }
+      const newCounselingItem = customCounseling.trim().startsWith('•') ? customCounseling.trim() : `• ${customCounseling.trim()}`;
+      addNewCounselingItem(newCounselingItem);
+      setCustomCounseling("");
     }
-  }, [customCounseling, state.counseling, setState]);
+  }, [customCounseling, addNewCounselingItem]);
+
 
   const removeCounseling = useCallback((index: number) => {
       setState(prevState => ({
@@ -348,12 +340,12 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             {state.shakeMode === 'with' && (
                 <div>
                     <Label htmlFor="shakeCount">কত বার ঝাঁকি দিবেন?</Label>
-                    <Input id="shakeCount" name="shakeCount" type="number" value={state.shakeCount} onChange={handleNumberChange} min="1" />
+                    <Input id="shakeCount" name="shakeCount" type="number" value={state.shakeCount ?? ''} onChange={handleNumberChange} min="1" />
                 </div>
             )}
             <div>
                 <Label htmlFor="drops">কত ফোঁটা করে খাবেন?</Label>
-                <Input id="drops" name="drops" type="number" value={state.drops} onChange={handleNumberChange} min="1" />
+                <Input id="drops" name="drops" type="number" value={state.drops ?? ''} onChange={handleNumberChange} min="1" />
             </div>
         </div>
 
@@ -396,7 +388,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         {(state.intervalMode === 'hourly' || state.intervalMode === 'daily') && (
           <div>
               <Label htmlFor="interval">কত {state.intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন'} পর পর খাবেন?</Label>
-              <Input id="interval" name="interval" type="number" value={state.interval} onChange={handleNumberChange} min="1" />
+              <Input id="interval" name="interval" type="number" value={state.interval ?? ''} onChange={handleNumberChange} min="1" />
           </div>
         )}
         
@@ -444,7 +436,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
           </div>
           <div>
               <Label htmlFor="durationDays">কত দিন খাবেন?</Label>
-              <Input id="durationDays" name="durationDays" type="number" value={state.durationDays} onChange={handleNumberChange} min="1" />
+              <Input id="durationDays" name="durationDays" type="number" value={state.durationDays ?? ''} onChange={handleNumberChange} min="1" />
           </div>
         </div>
 
@@ -455,7 +447,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                     id="labelCount"
                     name="labelCount"
                     type="number"
-                    value={state.labelCount}
+                    value={state.labelCount ?? ''}
                     onChange={handleLabelCountChange}
                     onBlur={(e) => {
                       const value = e.target.value;
@@ -468,7 +460,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             </div>
              <div>
                 <Label htmlFor="followUpDays">কত দিন পরে আসবেন?</Label>
-                <Input id="followUpDays" name="followUpDays" type="number" value={state.followUpDays} onChange={handleNumberChange} min="1" />
+                <Input id="followUpDays" name="followUpDays" type="number" value={state.followUpDays ?? ''} onChange={handleNumberChange} min="1" />
             </div>
         </div>
       </div>
