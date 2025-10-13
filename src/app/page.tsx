@@ -118,6 +118,7 @@ export default function Home() {
     const container = printContainerRef.current;
     if (!container) return;
 
+    // Remove any existing printable content before creating a new one
     const existingPrintableContent = document.getElementById('printable-content');
     if (existingPrintableContent) {
         document.body.removeChild(existingPrintableContent);
@@ -134,14 +135,14 @@ export default function Home() {
     });
 
     document.body.appendChild(printableContent);
-
+    
     if (labelState.patientName) {
       document.title = labelState.patientName;
     }
 
     const handleAfterPrint = () => {
       document.title = originalTitleRef.current;
-      if (printableContent.parentNode === document.body) {
+      if (printableContent && printableContent.parentNode === document.body) {
           document.body.removeChild(printableContent);
       }
       window.removeEventListener('afterprint', handleAfterPrint);
@@ -253,3 +254,4 @@ export default function Home() {
 }
     
 
+    

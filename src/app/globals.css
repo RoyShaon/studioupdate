@@ -217,6 +217,12 @@
   body > *:not(#printable-content) {
     display: none !important;
   }
+  
+  #printable-content {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
 
   .prescription-sheet-final {
     margin: 0;
@@ -224,14 +230,16 @@
     box-shadow: none;
     page-break-after: always;
   }
-
-  @page {
-      size: 3.6in 5.6in;
-      margin: 0;
-  }
   
   .prescription-sheet-final,
   .prescription-sheet-final * {
     color: #000 !important;
   }
+
+  @page {
+      size: 3.6in 5.6in;
+      margin: 0;
+  }
 }
+
+    
