@@ -42,7 +42,6 @@ const defaultCounseling = [
   "• ঔষধ সেবনকালীন যাবতীয় ঔষধি নিষিদ্ধ।",
   "• ঔষধ সেবনের আধা ঘন্টা আগে-পরে জল ব্যতিত কোন খাবার খাবেন না।",
   "• জরুরী প্রয়োজনে বিকাল <strong>৫টা</strong> থেকে <strong>৭টার</strong> মধ্যে ফোন করুন।",
-  "• <strong>৭ দিন</strong> পরে আসবেন।"
 ];
 
 const defaultLabelState: LabelState = {
@@ -74,25 +73,46 @@ export default function Home() {
         const parsedState = JSON.parse(savedState);
         parsedState.date = new Date(parsedState.date);
         
+        // Ensure default counseling items are present if they are missing
+        let counselingNeedsUpdate = false;
         if (!parsedState.counseling || parsedState.counseling.length === 0) {
-          parsedState.counseling = defaultCounseling;
+          parsedState.counseling = [...defaultCounseling];
+          counselingNeedsUpdate = true;
+        }
+
+        const followUpDays = parsedState.followUpDays || 7;
+        const followUpText = `• <strong>${convertToBanglaNumerals(followUpDays)} দিন</strong> পরে আসবেন।`;
+        const followUpIndex = parsedState.counseling.findIndex((c: string) => c.includes("পরে আসবেন"));
+        
+        if (followUpIndex > -1) {
+            if(parsedState.counseling[followUpIndex] !== followUpText) {
+                parsedState.counseling[followUpIndex] = followUpText;
+                counselingNeedsUpdate = true;
+            }
+        } else {
+            parsedState.counseling.push(followUpText);
+            counselingNeedsUpdate = true;
         }
         
-        if (!parsedState.intervalMode) {
-          parsedState.intervalMode = 'hourly';
-        }
-        if (!parsedState.mealTime) {
-          parsedState.mealTime = 'none';
-        }
-        if (parsedState.labelCount === undefined || parsedState.labelCount < 1) {
-          parsedState.labelCount = 1;
-        }
+        if (!parsedState.intervalMode) parsedState.intervalMode = 'hourly';
+        if (!parsedState.mealTime) parsedState.mealTime = 'none';
+        if (parsedState.labelCount === undefined || parsedState.labelCount < 1) parsedState.labelCount = 1;
+        
         return parsedState;
       }
     } catch (error) {
       console.error("Failed to load state from local storage:", error);
     }
-    return defaultLabelState;
+    
+    // Return default state with follow up day text
+    const defaultStateWithFollowUp = {
+        ...defaultLabelState,
+        counseling: [
+            ...defaultLabelState.counseling,
+            `• <strong>${convertToBanglaNumerals(defaultLabelState.followUpDays || 7)} দিন</strong> পরে আসবেন।`
+        ]
+    };
+    return defaultStateWithFollowUp;
   });
   
   const [isClient, setIsClient] = useState(false);
@@ -148,7 +168,14 @@ export default function Home() {
     if (isClient) {
       localStorage.removeItem("pharmaLabelState");
     }
-    setLabelState(defaultLabelState);
+    const defaultStateWithFollowUp = {
+        ...defaultLabelState,
+        counseling: [
+            ...defaultLabelState.counseling,
+            `• <strong>${convertToBanglaNumerals(defaultLabelState.followUpDays || 7)} দিন</strong> পরে আসবেন।`
+        ]
+    };
+    setLabelState(defaultStateWithFollowUp);
   }, [isClient]);
 
   const renderPreviews = useCallback(() => {
@@ -173,7 +200,7 @@ export default function Home() {
   return (
     <main className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hide-on-print">
           <div>
             <h1 className="text-4xl font-bold tracking-tight font-body text-primary">
               ত্রিফুল আরোগ্য নিকেতন
@@ -185,7 +212,7 @@ export default function Home() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          <Card className="lg:col-span-2 shadow-lg">
+          <Card className="lg:col-span-2 shadow-lg hide-on-print">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="font-body">রোগীর তথ্য ও নির্দেশাবলী</CardTitle>
                 <TooltipProvider>
@@ -217,7 +244,7 @@ export default function Home() {
 
           <div className="lg:col-span-3">
              <Card className="shadow-lg sticky top-8">
-                <CardHeader className="text-center">
+                <CardHeader className="text-center hide-on-print">
                   <CardTitle className="text-2xl font-semibold">ফর্মের প্রিভিউ</CardTitle>
                   <CardDescription>
                     নিচের ফরম্যাটটি প্রিন্ট লেবেলের মতো দেখাবে ({convertToBanglaNumerals('3.6')}” x {convertToBanglaNumerals('5.6')}”)। 
@@ -228,7 +255,7 @@ export default function Home() {
                       {renderPreviews()}
                   </div>
                 </CardContent>
-                 <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6">
+                 <div className="flex justify-center items-center flex-wrap gap-4 mt-6 p-6 hide-on-print">
                     <Button onClick={handlePrint} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-2 px-8 rounded-lg shadow-xl transition duration-150 focus:outline-none focus:ring-4 focus:ring-primary/50">
                       <Printer className="mr-2 h-4 w-4" />
                       প্রিন্ট করুন
