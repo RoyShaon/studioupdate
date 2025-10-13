@@ -152,15 +152,18 @@
 .prescription-sheet-final .instruction-box {
   padding: 0.5rem !important;
   border: 1px dashed #6b7280 !important;
+  line-height: 1.5 !important;
+  font-size: 9.4pt !important;
+}
+
+.prescription-sheet-final .instruction-box.instruction-long-text {
+  font-size: 9.2pt !important;
   line-height: 1.45 !important;
 }
 
+
 .print-page .prescription-sheet-final .instruction-box {
   border-color: transparent !important;
-}
-
-.prescription-sheet-final .instruction-box.text-justify {
-  font-size: 9.2pt !important;
 }
 
 .prescription-sheet-final .advice-list {
@@ -276,6 +279,7 @@
 }
 
     
+
 
 
 

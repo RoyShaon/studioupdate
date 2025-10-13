@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { convertToBanglaNumerals } from "@/lib/utils";
+import { convertToBanglaNumerals, cn } from "@/lib/utils";
 import type { LabelState } from "@/app/page";
 
 interface LabelPreviewProps extends LabelState {
@@ -99,9 +99,17 @@ export default function LabelPreview({
       processedInstruction = processedInstruction.replace(' অন্তর অন্তর ', ' অন্তর ');
     }
     
+    // Dynamic class for font size adjustment
+    const INSTRUCTION_LENGTH_THRESHOLD = 230;
+    const instructionLength = processedInstruction.replace(/<[^>]*>/g, '').length;
+    const instructionClassName = cn(
+        'instruction-box text-justify',
+        { 'instruction-long-text': instructionLength > INSTRUCTION_LENGTH_THRESHOLD }
+    );
+
     return (
       <div 
-        className="instruction-box text-justify"
+        className={instructionClassName}
         dangerouslySetInnerHTML={{ __html: processedInstruction.replace(/\n/g, '<br>') }} 
       />
     );
@@ -183,3 +191,4 @@ export default function LabelPreview({
     </div>
   );
 }
+
