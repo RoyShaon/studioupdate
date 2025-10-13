@@ -234,6 +234,16 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
           counseling: prevState.counseling.filter((_, i) => i !== index)
       }));
   }, [setState]);
+  
+  const handleIntervalModeChange = useCallback((value: IntervalMode) => {
+    setState(prev => {
+        if (value !== 'meal-time') {
+            return {...prev, intervalMode: value};
+        }
+        return {...prev, intervalMode: value, mealTime: 'morning'};
+    });
+  }, [setState]);
+
 
   return (
     <div className="space-y-6">
@@ -353,7 +363,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
               <Select
                   name="intervalMode"
                   value={state.intervalMode}
-                  onValueChange={(value: IntervalMode) => setState(prev => ({...prev, intervalMode: value}))}
+                  onValueChange={handleIntervalModeChange}
               >
                   <SelectTrigger>
                       <SelectValue placeholder="Select..."/>
@@ -376,28 +386,29 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
           </div>
         )}
 
-        {state.intervalMode === 'meal-time' && (
-           <div>
-              <Label htmlFor="mealTime">কোন সময়?</Label>
-              <Select
-                  name="mealTime"
-                  value={state.mealTime}
-                  onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
-              >
-                  <SelectTrigger>
-                      <SelectValue placeholder="Select..."/>
-                  </SelectTrigger>
-                  <SelectContent>
-                      <SelectItem value="morning">সকালে</SelectItem>
-                      <SelectItem value="noon">দুপুরে</SelectItem>
-                      <SelectItem value="afternoon">বিকালে</SelectItem>
-                      <SelectItem value="night">রাতে</SelectItem>
-                      <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
-                      <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
-                  </SelectContent>
-                </Select>
-          </div>
-        )}
+        
+        <div >
+            <Label htmlFor="mealTime">নির্দিষ্ট সময় (ঐচ্ছিক)</Label>
+            <Select
+                name="mealTime"
+                value={state.mealTime}
+                onValueChange={(value: MealTime) => setState(prev => ({...prev, mealTime: value}))}
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder="নির্বাচন করুন..."/>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="none">কোনোটিই নয়</SelectItem>
+                    <SelectItem value="morning">সকালে</SelectItem>
+                    <SelectItem value="noon">দুপুরে</SelectItem>
+                    <SelectItem value="afternoon">বিকালে</SelectItem>
+                    <SelectItem value="night">রাতে</SelectItem>
+                    <SelectItem value="morning-night">সকালে ও রাতে</SelectItem>
+                    <SelectItem value="morning-afternoon">সকালে ও বিকালে</SelectItem>
+                </SelectContent>
+              </Select>
+        </div>
+        
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>

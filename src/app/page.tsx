@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 
 
 export type IntervalMode = "hourly" | "daily" | "meal-time";
-export type MealTime = "morning" | "noon" | "afternoon" | "night" | "morning-night" | "morning-afternoon";
+export type MealTime = "none" | "morning" | "noon" | "afternoon" | "night" | "morning-night" | "morning-afternoon";
 
 export type LabelState = {
   serial: string;
@@ -57,7 +57,7 @@ const defaultLabelState: LabelState = {
   shakeCount: 10,
   intervalMode: "hourly",
   interval: 12,
-  mealTime: "morning",
+  mealTime: "none",
   mixtureAmount: "১ চামচ ঔষধ",
   durationDays: 7,
   counseling: defaultCounseling,
@@ -92,7 +92,7 @@ export default function Home() {
           parsedState.intervalMode = 'hourly';
         }
          if (!parsedState.mealTime) {
-          parsedState.mealTime = 'morning';
+          parsedState.mealTime = 'none';
         }
 
         setLabelState(parsedState);

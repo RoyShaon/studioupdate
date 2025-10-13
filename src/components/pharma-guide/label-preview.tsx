@@ -41,6 +41,17 @@ export default function LabelPreview({
   const renderInstruction = () => {
     const bnDrops = drops !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(drops)} ফোঁটা</strong>` : '___';
     
+    let timeText = '';
+    switch(mealTime) {
+        case 'morning': timeText = `<strong class="text-red-700">সকালে</strong>`; break;
+        case 'noon': timeText = `<strong class="text-red-700">দুপুরে</strong>`; break;
+        case 'afternoon': timeText = `<strong class="text-red-700">বিকালে</strong>`; break;
+        case 'night': timeText = `<strong class="text-red-700">রাতে</strong>`; break;
+        case 'morning-night': timeText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">রাতে</strong>`; break;
+        case 'morning-afternoon': timeText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">বিকালে</strong>`; break;
+        default: timeText = "";
+    }
+    
     let intervalText = '';
     if (intervalMode === 'hourly' || intervalMode === 'daily') {
         if (interval !== '') {
@@ -50,17 +61,14 @@ export default function LabelPreview({
         } else {
             intervalText = '___ অন্তর অন্তর';
         }
-    } else { // meal-time
-        switch(mealTime) {
-            case 'morning': intervalText = `<strong class="text-red-700">সকালে</strong>`; break;
-            case 'noon': intervalText = `<strong class="text-red-700">দুপুরে</strong>`; break;
-            case 'afternoon': intervalText = `<strong class="text-red-700">বিকালে</strong>`; break;
-            case 'night': intervalText = `<strong class="text-red-700">রাতে</strong>`; break;
-            case 'morning-night': intervalText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">রাতে</strong>`; break;
-            case 'morning-afternoon': intervalText = `<strong class="text-red-700">সকালে</strong> ও <strong class="text-red-700">বিকালে</strong>`; break;
-            default: intervalText = "___";
-        }
     }
+    
+    // Combine interval and time text
+    let finalTimeInstruction = [intervalText, timeText].filter(Boolean).join(' ');
+    if (!finalTimeInstruction.trim()) {
+        finalTimeInstruction = (intervalMode === 'meal-time' && timeText) ? timeText : "___";
+    }
+
 
     const bnShakeCount = shakeMode === 'with' && shakeCount !== '' ? `<strong class="text-red-700">${convertToBanglaNumerals(shakeCount)} বার</strong>` : '___';
     
@@ -76,9 +84,9 @@ export default function LabelPreview({
 
     let instruction;
     if (shakeMode === "with") {
-        instruction = `ঔষধ সেবনের আগে শিশিটিকে হাতের তালুর উপরে দূর হতে সজোরে থেমে থেমে ${bnShakeCount} ঝাঁকি দিয়ে ${bnDrops} ঔষধ ${highlightedCupAmount} ঠান্ডা জলের সাথে চামচ দিয়ে ভালোভাবে মিশিয়ে ${bnMixtureAmount} ${intervalText} > ${bnDurationDays} সেবন করুন।`;
+        instruction = `ঔষধ সেবনের আগে শিশিটিকে হাতের তালুর উপরে দূর হতে সজোরে থেমে থেমে ${bnShakeCount} ঝাঁকি দিয়ে ${bnDrops} ঔষধ ${highlightedCupAmount} ঠান্ডা জলের সাথে চামচ দিয়ে ভালোভাবে মিশিয়ে ${bnMixtureAmount} ${finalTimeInstruction} > ${bnDurationDays} সেবন করুন।`;
     } else {
-      instruction = `প্রতিবার ঔষধ সেবনের পূর্বে ${bnDrops} ঔষধ ${highlightedCupAmount} ঠান্ডা জলের সাথে চামচ দিয়ে ভালভাবে মিশিয়ে ${bnMixtureAmount} ${intervalText} > ${bnDurationDays} সেবন করুন।`;
+      instruction = `প্রতিবার ঔষধ সেবনের পূর্বে ${bnDrops} ঔষধ ${highlightedCupAmount} ঠান্ডা জলের সাথে চামচ দিয়ে ভালভাবে মিশিয়ে ${bnMixtureAmount} ${finalTimeInstruction} > ${bnDurationDays} সেবন করুন।`;
     }
     
     let processedInstruction = convertToBanglaNumerals(instruction);
