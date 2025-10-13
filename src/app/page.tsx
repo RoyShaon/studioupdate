@@ -166,7 +166,7 @@ export default function Home() {
   const renderPreviews = useCallback(() => {
     const count = Number(labelState.labelCount) || 1;
     return Array.from({ length: count }, (_, i) => i + 1).map(index => (
-        <div key={index} className="printable-label-wrapper mb-4">
+        <div key={index} className="printable-label-wrapper">
         <LabelPreview {...labelState} activeLabelIndex={index} />
         </div>
     ));
