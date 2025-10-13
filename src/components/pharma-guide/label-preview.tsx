@@ -58,9 +58,10 @@ export default function LabelPreview({
         if (interval !== '') {
             const bnIntervalNumber = convertToBanglaNumerals(interval);
             const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
-            intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong> অন্তর অন্তর`;
+            const suffix = timeText ? ' অন্তর' : ' অন্তর অন্তর';
+            intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong>${suffix}`;
         } else {
-            intervalText = '___ অন্তর অন্তর';
+             intervalText = timeText ? '___ অন্তর' : '___ অন্তর অন্তর';
         }
     } else if (intervalMode === 'meal-time' && mealTime === 'none') {
         intervalText = "___";
