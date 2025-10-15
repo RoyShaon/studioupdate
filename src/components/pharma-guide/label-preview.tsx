@@ -59,8 +59,6 @@ export default function LabelPreview({
         const unitText = intervalMode === 'hourly' ? 'ঘন্টা' : 'দিন';
         const suffix = 'অন্তর';
         intervalText = `<strong class="text-red-700">${bnIntervalNumber} ${unitText}</strong> ${suffix}`;
-    } else if (intervalMode === 'meal-time' && mealTime === 'none') {
-        intervalText = "___";
     }
     
     let finalTimeInstruction = [intervalText, timeText].filter(Boolean).join(' ');
@@ -136,7 +134,7 @@ export default function LabelPreview({
     <div
       className="prescription-sheet-final font-body"
     >
-        <div className="space-y-1 pt-2">
+        <div className="space-y-1 pt-4">
             <div>
                 <div className="flex justify-between items-center text-sm font-medium mb-1">
                     <span className="truncate pr-1"><strong>ক্রমিক নং:</strong> <strong className="text-red-700">{serial}</strong></span>
