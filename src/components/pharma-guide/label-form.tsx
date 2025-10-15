@@ -79,7 +79,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     const abbreviationMap: { [key: string]: string } = {
         "মোহাম্মদ": "মোঃ",
         "মুহাম্মদ": "মোঃ",
-        "মুসাম্মৎ": "মোসাঃ",
+        "মোসাম্মৎ": "মোসাঃ",
         "ডাক্তার": "ডাঃ",
         "ইঞ্জিনিয়ার": "ইঞ্জিঃ",
         "অ্যাডভোকেট": "অ্যাডঃ",
@@ -244,10 +244,6 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         if (value === 'meal-time') {
             if(prev.mealTime === 'none') {
                 newState.mealTime = 'morning';
-            }
-        } else { // hourly or daily
-            if(prev.interval === undefined) {
-               newState.interval = 12;
             }
         }
         return newState;
@@ -565,5 +561,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
 
     
