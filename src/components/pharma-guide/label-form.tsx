@@ -87,9 +87,14 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
                 interim_transcript += event.results[i][0].transcript;
             }
         }
-        
+
+        // Replace "Mohammad" or "Muhammad" with "Md."
+        const replaceMohammad = (text: string) => {
+            return text.replace(/মোহাম্মদ|মুহাম্মদ/g, 'মোঃ');
+        };
+
         if (final_transcript_piece) {
-            finalTranscriptRef.current += final_transcript_piece + ' ';
+            finalTranscriptRef.current += replaceMohammad(final_transcript_piece) + ' ';
         }
 
         const nameInput = patientNameInputRef.current;
@@ -103,12 +108,12 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             const textBefore = currentVal.substring(0, start);
             const textAfter = currentVal.substring(end);
 
-            const newText = textBefore.trimEnd() + (interim_transcript ? " " + interim_transcript : "") + textAfter;
+            const newText = textBefore.trimEnd() + (interim_transcript ? " " + replaceMohammad(interim_transcript) : "") + textAfter;
             
             setState(prevState => ({ ...prevState, patientName: newText.trimStart() }));
 
         } else {
-             setState(prevState => ({ ...prevState, patientName: finalTranscriptRef.current + interim_transcript}));
+             setState(prevState => ({ ...prevState, patientName: finalTranscriptRef.current + replaceMohammad(interim_transcript)}));
         }
     };
 
@@ -234,7 +239,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     setState(prev => {
         let newState = {...prev, intervalMode: value};
         if (value === 'meal-time') {
-            newState.interval = undefined;
+            // newState.interval = undefined; // Keep interval value
             if(prev.mealTime === 'none') {
                 newState.mealTime = 'morning';
             }
