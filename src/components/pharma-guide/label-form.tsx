@@ -87,7 +87,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         let newText = text;
         for (const word in abbreviationMap) {
             // Use a regex for whole-word replacement
-            const regex = new RegExp(`\\b${word}\\b`, 'g');
+            const regex = new RegExp(word, 'g');
             newText = newText.replace(regex, abbreviationMap[word]);
         }
         return newText;
@@ -99,8 +99,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-                 const final_transcript_piece = applyAbbreviations(event.results[i][0].transcript.trim());
-                 // Prevent duplication by checking if the new piece is already at the end
+                 const final_transcript_piece = event.results[i][0].transcript.trim();
                  if (!finalTranscriptRef.current.endsWith(final_transcript_piece + ' ')) {
                     finalTranscriptRef.current += final_transcript_piece + ' ';
                  }
@@ -109,32 +108,12 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             }
         }
         
-        const nameInput = patientNameInputRef.current;
-        if(nameInput) {
-            const start = nameInput.selectionStart ?? finalTranscriptRef.current.length;
-            const end = nameInput.selectionEnd ?? finalTranscriptRef.current.length;
-            
-            const currentVal = finalTranscriptRef.current;
-            
-            const textBefore = currentVal.substring(0, start);
-            const textAfter = currentVal.substring(end);
-            
-            const processedInterim = applyAbbreviations(interim_transcript);
+        const currentVal = finalTranscriptRef.current;
+        let displayValue = (currentVal.trim() ? currentVal.trim() + ' ' : '') + interim_transcript;
+        
+        displayValue = applyAbbreviations(displayValue);
 
-            // Construct the new value ensuring no double spaces
-            const finalPart = finalTranscriptRef.current.trim();
-            const interimPart = processedInterim.trim();
-
-            let displayValue = finalPart;
-            if (interimPart) {
-                displayValue = (finalPart ? finalPart + ' ' : '') + interimPart;
-            }
-            
-            setState(prevState => ({ ...prevState, patientName: displayValue.trimStart() }));
-
-        } else {
-             setState(prevState => ({ ...prevState, patientName: (finalTranscriptRef.current + applyAbbreviations(interim_transcript)).trimStart() }));
-        }
+        setState(prevState => ({ ...prevState, patientName: displayValue.trimStart() }));
     };
 
     recognition.onerror = (event: any) => {
@@ -152,7 +131,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     recognition.onend = () => {
       setIsListening(false);
        if (finalTranscriptRef.current.trim()) {
-           const finalName = finalTranscriptRef.current.trim();
+           const finalName = applyAbbreviations(finalTranscriptRef.current.trim());
            setState(prevState => ({...prevState, patientName: finalName}));
       }
     };
@@ -584,5 +563,3 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
-
-    
