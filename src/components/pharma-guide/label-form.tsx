@@ -81,12 +81,14 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
         "মুহাম্মদ": "মোঃ",
         "মুসাম্মৎ": "মোসাঃ",
         "ডাক্তার": "ডাঃ",
+        "ইঞ্জিনিয়ার": "ইঞ্জিঃ",
+        "অ্যাডভোকেট": "অ্যাডঃ",
+        "অধ্যাপক": "অধঃ",
     };
 
     const applyAbbreviations = (text: string) => {
         let newText = text;
         for (const word in abbreviationMap) {
-            // Use a regex for whole-word replacement
             const regex = new RegExp(word, 'g');
             newText = newText.replace(regex, abbreviationMap[word]);
         }
@@ -563,3 +565,5 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
