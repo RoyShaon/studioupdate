@@ -75,28 +75,40 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     recognition.continuous = true;
     recognition.lang = 'bn-BD';
     recognition.interimResults = true;
+    
+    const abbreviationMap: { [key: string]: string } = {
+        "মোহাম্মদ": "মোঃ",
+        "মুহাম্মদ": "মোঃ",
+        "মুসাম্মৎ": "মোসাঃ",
+        "ডাক্তার": "ডাঃ",
+    };
+
+    const applyAbbreviations = (text: string) => {
+        let newText = text;
+        for (const word in abbreviationMap) {
+            // Use a regex for whole-word replacement
+            const regex = new RegExp(`\\b${word}\\b`, 'g');
+            newText = newText.replace(regex, abbreviationMap[word]);
+        }
+        return newText;
+    };
+
 
     recognition.onresult = (event: any) => {
         let interim_transcript = '';
-        let final_transcript_piece = '';
-
+        
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-                final_transcript_piece += event.results[i][0].transcript;
+                 const final_transcript_piece = applyAbbreviations(event.results[i][0].transcript.trim());
+                 // Prevent duplication by checking if the new piece is already at the end
+                 if (!finalTranscriptRef.current.endsWith(final_transcript_piece + ' ')) {
+                    finalTranscriptRef.current += final_transcript_piece + ' ';
+                 }
             } else {
                 interim_transcript += event.results[i][0].transcript;
             }
         }
-
-        // Replace "Mohammad" or "Muhammad" with "Md."
-        const replaceMohammad = (text: string) => {
-            return text.replace(/মোহাম্মদ|মুহাম্মদ/g, 'মোঃ');
-        };
-
-        if (final_transcript_piece) {
-            finalTranscriptRef.current += replaceMohammad(final_transcript_piece) + ' ';
-        }
-
+        
         const nameInput = patientNameInputRef.current;
         if(nameInput) {
             const start = nameInput.selectionStart ?? finalTranscriptRef.current.length;
@@ -104,16 +116,24 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
             
             const currentVal = finalTranscriptRef.current;
             
-            // If there's a selection, replace it. Otherwise, insert at cursor.
             const textBefore = currentVal.substring(0, start);
             const textAfter = currentVal.substring(end);
-
-            const newText = textBefore.trimEnd() + (interim_transcript ? " " + replaceMohammad(interim_transcript) : "") + textAfter;
             
-            setState(prevState => ({ ...prevState, patientName: newText.trimStart() }));
+            const processedInterim = applyAbbreviations(interim_transcript);
+
+            // Construct the new value ensuring no double spaces
+            const finalPart = finalTranscriptRef.current.trim();
+            const interimPart = processedInterim.trim();
+
+            let displayValue = finalPart;
+            if (interimPart) {
+                displayValue = (finalPart ? finalPart + ' ' : '') + interimPart;
+            }
+            
+            setState(prevState => ({ ...prevState, patientName: displayValue.trimStart() }));
 
         } else {
-             setState(prevState => ({ ...prevState, patientName: finalTranscriptRef.current + replaceMohammad(interim_transcript)}));
+             setState(prevState => ({ ...prevState, patientName: (finalTranscriptRef.current + applyAbbreviations(interim_transcript)).trimStart() }));
         }
     };
 
@@ -151,7 +171,9 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     if (isListening) {
       recognition.stop();
     } else {
+      // Start with the current input value
       finalTranscriptRef.current = state.patientName || '';
+      // Add a space if there's text and it doesn't end with one
       if(finalTranscriptRef.current && !finalTranscriptRef.current.endsWith(' ')) {
           finalTranscriptRef.current += ' ';
       }
@@ -239,7 +261,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     setState(prev => {
         let newState = {...prev, intervalMode: value};
         if (value === 'meal-time') {
-            // newState.interval = undefined; // Keep interval value
+            //newState.interval = undefined; // Keep interval value
             if(prev.mealTime === 'none') {
                 newState.mealTime = 'morning';
             }
@@ -563,5 +585,3 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
-
-    
