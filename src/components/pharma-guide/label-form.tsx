@@ -212,7 +212,7 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
 
     if (!isNaN(numValue) && numValue > 0) {
         setState(prevState => ({ ...prevState, labelCount: numValue }));
-    } else if (!isNaN(numValue) && numValue < 1) {
+    } else if (isNaN(numValue) || numValue < 1) {
         setState(prevState => ({ ...prevState, labelCount: 1 }));
     }
   };
@@ -261,7 +261,6 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     setState(prev => {
         let newState = {...prev, intervalMode: value};
         if (value === 'meal-time') {
-            //newState.interval = undefined; // Keep interval value
             if(prev.mealTime === 'none') {
                 newState.mealTime = 'morning';
             }
@@ -585,3 +584,5 @@ export default function LabelForm({ state, setState }: LabelFormProps) {
     </div>
   );
 }
+
+    
